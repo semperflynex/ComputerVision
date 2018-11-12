@@ -13,7 +13,7 @@ warning('off','all')
           for p3=p2+1:c
             for p4=p3+1:c
                 
-               if (maxinliner<11)
+               if (maxinliner<23)
                    
                 
                  selectedPoints1=[matchedPoints1(p1);matchedPoints1(p2);matchedPoints1(p3);matchedPoints1(p4)];
@@ -23,8 +23,8 @@ warning('off','all')
                 ntform=vntform.T;
                 inliner=0;
                 
-                for n=1:c
-                    idiff=getTransformError(ntform,[matchedPoints1(n).Location,1],[matchedPoints2(n).Location,1])
+                parfor n=1:c
+                    idiff=getTransformError(ntform,[matchedPoints1(n).Location,1],[matchedPoints2(n).Location,1]);
                    if(idiff<1.00)
                        inliner=inliner+1;
                    end
@@ -32,7 +32,7 @@ warning('off','all')
                 
                if (inliner>maxinliner)
                    tform=ntform;
-                   maxinliner=inliner;
+                   maxinliner=inliner
                end
                 end
              

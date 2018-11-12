@@ -13,8 +13,8 @@ corners2=detectSURFFeatures(I2);
 
 [features1,valid_corners1]=extractFeatures(I1,corners1);
 [features2,valid_corners2]=extractFeatures(I2,corners2);
-figure;imshow(I1);hold on
-plot(valid_corners1);
+%figure;imshow(I1);hold on
+%plot(valid_corners1);
 %% 
 % Finden von passenden features
 
@@ -28,8 +28,9 @@ matchedPoints2 = corners2(indexPairs(:,2), :);
 % Perform RANSAC Automatically
 
 transform = estimateGeometricTransform(matchedPoints1, matchedPoints2,...
-        'projective', 'Confidence', 99.9, 'MaxNumTrials', 2000)
-%% 
+        'projective', 'Confidence', 99.9, 'MaxNumTrials', 2000);
+
+%%
 % Perform Brute Force Sample Consensus BFSAC
 % 
 % Hier werden nicht zufällig Punktkombinationen ausgewählt sondern einfach 
