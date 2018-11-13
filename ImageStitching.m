@@ -40,8 +40,6 @@ transform=BFSAC(matchedPoints1,matchedPoints2)
 %% 
 % Transformieren der Bilder mit der errechneten Transformationsmatrix "transform" 
 % entweder mit RANSAC oder BFSAC ja nachdem welche zelle zuletzt augeführt wurde
-% 
-% TODO: hier ist etwas faul
 
 height=480*2
 width=640
