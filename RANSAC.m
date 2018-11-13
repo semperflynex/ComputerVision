@@ -1,10 +1,12 @@
-function [H] = RANSAC(points1,points2,p,eta,s)
+function [H] = RANSAC(points1,points2,p,eta,s,t)
 %RANSAC Algorithm
 % Calculates the Homography Matrix H
 % using pairs of Feature Points
 % p= Confidence
 % eta=estimated proportion of outliers
 % s= number of Points required for the Model
+% t= threshold distance (should be 5.99*sigma², but sigma is unknown)
+c=points1.Count;
 %%
 %Determine the Number of random Samples minimally required
 % s= number of Points required for the Model
@@ -12,18 +14,43 @@ N=log(1-p)/log(1-(1-eta)^s);
 N=ceil(N)
 %%
 % generate N random pairs of four Points
-count=points1.Count;
-combinations=zeros(count,s);
+combinations=zeros(N,s);
 for i=1:N
-    sequence=randperm(points1.Count,s);
+    sequence=randperm(c,s);
     %if add random sequence to vector if it doesnt exist already
     if (isempty(find(ismember(combinations,sequence,'rows'))))
         combinations(i,:)=sequence;
     end
 end
 %%
+maxinlier=0;
 for i=1:N
-    sequence=combinations(:
-
+    %pick s point pairs required for the calculation
+    selectedPoints1=points1(1:s);
+    selectedPoints2=points2(1:s);
+    for j=1:s
+        selectedPoints1(j)=points1(combinations(i,j));
+        selectedPoints2(j)=points2(combinations(i,j));
+    end
+   %calculate the transform
+    newH=fitgeotrans(selectedPoints1.Location,selectedPoints2.Location, 'projective');
+    newH=newH.T;
+    
+    inlier=0;
+    %evaluate H against all samples
+    for n=1:c
+        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+        error=sqrt(error);
+        if error<t
+            inlier=inlier+1;
+        end
+    end
+    
+    if inlier>maxinlier
+        H=newH;
+        maxinlier=inlier;
+    end
+end
+maxinlier
 end
 

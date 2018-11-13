@@ -6,6 +6,9 @@ function [error] = GeometricDistance(H,x1,x2)
 % x1 = first Picture Correspondance
 % x2 = second Picture Correspondance
 
+x1=[x1 1];
+x2=[x2 2];
+
 Hx1=x1*H;
 Hx1=Hx1/Hx1(3); %normieren
 d1=x2-Hx1;
