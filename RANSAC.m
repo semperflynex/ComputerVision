@@ -7,6 +7,8 @@ function [H] = RANSAC(points1,points2,p,eta,s,t)
 % s= number of Points required for the Model
 % t= threshold distance (should be 5.99*sigma², but sigma is unknown)
 c=points1.Count;
+points1=points1.Location;
+points2=points2.Location;
 %%
 %Determine the Number of random Samples minimally required
 % s= number of Points required for the Model
@@ -26,20 +28,20 @@ end
 maxinlier=0;
 for i=1:N
     %pick s point pairs required for the calculation
-    selectedPoints1=points1(1:s);
-    selectedPoints2=points2(1:s);
+    selectedPoints1=points1(1:s,:);
+    selectedPoints2=points2(1:s,:);
     for j=1:s
         selectedPoints1(j)=points1(combinations(i,j));
         selectedPoints2(j)=points2(combinations(i,j));
     end
    %calculate the transform
-    newH=fitgeotrans(selectedPoints1.Location,selectedPoints2.Location, 'projective');
+    newH=fitgeotrans(selectedPoints1,selectedPoints2, 'projective');
     newH=newH.T;
     
     inlier=0;
     %evaluate H against all samples
     for n=1:c
-        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+        error=GeometricDistance(newH,points1(n,:),points2(n,:));
         error=sqrt(error);
         if error<t
             inlier=inlier+1;
@@ -54,47 +56,48 @@ end
 maxinlier
 %%
 % recalculate matrix using all inliers
-newH=H;
-for j=1:10
-% get all inliers
-inliers1=points1(1:maxinlier);
-inliers2=points2(1:maxinlier);
-i=1;
-sumError=0;
-for n=1:c
-        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
-        error=sqrt(error);
-        if error<t
-            inliers1(i)=points1(n);
-            inliers2(i)=points2(n);
-            i=i+1;
-            sumError=sumError+error;
-        end
-end
-sumError
-i-1
-
-% calculate new matrix
-newH=fitgeotrans(inliers1.Location,inliers2.Location, 'projective');
-newH=newH.T;
-
-
-%get the new error
-i=1;
-for n=1:c
-        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
-        error=sqrt(error);
-        if error<t
-            inliers1(i)=points1(n);
-            inliers2(i)=points2(n);
-            i=i+1;
-            sumError=sumError+error;
-        end
-end
-sumError
-i-1
-end
-
-%H=newH;
+% NOT VERY EFFECTIVE!
+% newH=H;
+% for j=1:10
+% % get all inliers
+% inliers1=points1(1:maxinlier);
+% inliers2=points2(1:maxinlier);
+% i=1;
+% sumError=0;
+% for n=1:c
+%         error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+%         error=sqrt(error);
+%         if error<t
+%             inliers1(i)=points1(n);
+%             inliers2(i)=points2(n);
+%             i=i+1;
+%             sumError=sumError+error;
+%         end
+% end
+% sumError
+% i-1
+% 
+% % calculate new matrix
+% newH=fitgeotrans(inliers1.Location,inliers2.Location, 'projective');
+% newH=newH.T;
+% 
+% 
+% %get the new error
+% i=1;
+% for n=1:c
+%         error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+%         error=sqrt(error);
+%         if error<t
+%             inliers1(i)=points1(n);
+%             inliers2(i)=points2(n);
+%             i=i+1;
+%             sumError=sumError+error;
+%         end
+% end
+% sumError
+% i-1
+% end
+% 
+% %H=newH;
 end
 
