@@ -2,7 +2,7 @@
 % Bilder Laden:
 
 I1=rgb2gray(imread('images\bild1.jpg'));
-I2=rgb2gray(imread('images\bild3.jpg'));
+I2=rgb2gray(imread('images\bild2.jpg'));
 %% 
 % Feature Erkennung
 
@@ -25,18 +25,14 @@ indexPairs = matchFeatures(features1, features2, 'Unique', true)
 matchedPoints1 = corners1(indexPairs(:,1), :);
 matchedPoints2 = corners2(indexPairs(:,2), :);   
 %% 
-% Perform RANSAC Automatically
-
+% Perform RANSAC from Matlab example library
 transform = estimateGeometricTransform(matchedPoints1, matchedPoints2,...
         'projective', 'Confidence', 99.9, 'MaxNumTrials', 2000);
 
 %%
-% Perform Brute Force Sample Consensus BFSAC
-% 
-% Hier werden nicht zufällig Punktkombinationen ausgewählt sondern einfach 
-% alle möglichen durchiteriert
-transform=BFSAC(matchedPoints1,matchedPoints2)
- 
+% perform RANSAC myself
+transform=RANSAC(matchedPoints1,matchedPoints2,0.99,0.5,4,3)
+transform=projective2d(transform);
 %% 
 % Transformieren der Bilder mit der errechneten Transformationsmatrix "transform" 
 % entweder mit RANSAC oder BFSAC ja nachdem welche zelle zuletzt augeführt wurde

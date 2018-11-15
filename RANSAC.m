@@ -18,7 +18,7 @@ combinations=zeros(N,s);
 for i=1:N
     sequence=randperm(c,s);
     %if add random sequence to vector if it doesnt exist already
-    if (isempty(find(ismember(combinations,sequence,'rows'))))
+    if (isempty(find(ismember(combinations,sequence,'rows'), 1)))
         combinations(i,:)=sequence;
     end
 end
@@ -52,5 +52,49 @@ for i=1:N
     end
 end
 maxinlier
+%%
+% recalculate matrix using all inliers
+newH=H;
+for j=1:10
+% get all inliers
+inliers1=points1(1:maxinlier);
+inliers2=points2(1:maxinlier);
+i=1;
+sumError=0;
+for n=1:c
+        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+        error=sqrt(error);
+        if error<t
+            inliers1(i)=points1(n);
+            inliers2(i)=points2(n);
+            i=i+1;
+            sumError=sumError+error;
+        end
+end
+sumError
+i-1
+
+% calculate new matrix
+newH=fitgeotrans(inliers1.Location,inliers2.Location, 'projective');
+newH=newH.T;
+
+
+%get the new error
+i=1;
+for n=1:c
+        error=GeometricDistance(newH,points1(n).Location,points2(n).Location);
+        error=sqrt(error);
+        if error<t
+            inliers1(i)=points1(n);
+            inliers2(i)=points2(n);
+            i=i+1;
+            sumError=sumError+error;
+        end
+end
+sumError
+i-1
+end
+
+%H=newH;
 end
 
