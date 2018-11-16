@@ -28,11 +28,11 @@ end
 maxinlier=0;
 for i=1:N
     %pick s point pairs required for the calculation
-    selectedPoints1=points1(1:s,:);
-    selectedPoints2=points2(1:s,:);
+    selectedPoints1=zeros(s,2);
+    selectedPoints2=zeros(s,2);
     for j=1:s
-        selectedPoints1(j)=points1(combinations(i,j));
-        selectedPoints2(j)=points2(combinations(i,j));
+        selectedPoints1(j,:)=points1(combinations(i,j),:);
+        selectedPoints2(j,:)=points2(combinations(i,j),:);
     end
    %calculate the transform
     newH=fitgeotrans(selectedPoints1,selectedPoints2, 'projective');
