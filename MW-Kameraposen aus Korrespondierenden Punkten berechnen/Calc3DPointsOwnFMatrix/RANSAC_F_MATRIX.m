@@ -3,7 +3,7 @@ F = 0;
 hPoints1 = [matchedPoints1.Location, ones(length(matchedPoints1),1)];
 hPoints2 = [matchedPoints2.Location, ones(length(matchedPoints2),1)];
 
-Iterationen = 1000;
+Iterationen = 10000;
 thresh = 0.01;
 inlierCount = 0;
 bestF = 0;
