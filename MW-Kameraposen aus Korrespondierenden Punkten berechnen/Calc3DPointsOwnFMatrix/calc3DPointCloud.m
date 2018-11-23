@@ -1,7 +1,6 @@
 function calc3DPointCloud
 imds = imageDatastore('C:\Users\Michi\Dropbox\Michi Uniordner\Master\3.Semester\Computervision\Calc3DPointsOwnFMatrix');
 
-% Display the images.
 %figure
 %montage(imds.Files);
 %title('Input Image Sequence');
@@ -60,11 +59,11 @@ for i = 2:numel(images)
     % The pose is computed up to scale, meaning that the distance between
     % the cameras in the previous view and the current view is set to 1.
     % This will be corrected by the bundle adjustment.
-    [relativeOrient, relativeLoc, inlierIdx] = helperEstimateRelativePose(...
-        matchedPoints1, matchedPoints2, cameraParams);
+    %[relativeOrient, relativeLoc, inlierIdx] = helperEstimateRelativePose(...
+        %matchedPoints1, matchedPoints2, cameraParams);
     [F, inlierIdx] = RANSAC_F_MATRIX(matchedPoints1,matchedPoints2);
     E = A5cameraParams.IntrinsicMatrix * F * A5cameraParams.IntrinsicMatrix';
-    getCameraPose(E);
+    [relativeOrient, relativeLoc] = getCameraPose(E,cameraParams,matchedPoints1(inlierIdx,:), matchedPoints2(inlierIdx,:));
     % Add the current view to the view set.
     vSet = addView(vSet, i, 'Points', currPoints);
     
@@ -127,7 +126,7 @@ end
     zlim([loc1(3)-1, loc1(3)+20]);
     camorbit(0, -30);
 
-%     title('Refined Camera Poses');
+% title('Refined Camera Poses');
 %     
 % % Read and undistort the first image
 % I = undistortImage(images{1}, cameraParams); 
@@ -204,6 +203,6 @@ end
 % camorbit(0, -30);
 % 
 % title('Dense Reconstruction');
-
-end
+% 
+% end
 
