@@ -6,7 +6,9 @@ function [H] = ProjectiveTransform(xy,uv)
 % mit ' =uv
 % u=x'
 % v=y'
-[xy,uv,T1,T2]=normalizePoints(xy,uv);
+
+% [xy,uv,T1,T2]=normalizePoints(xy,uv);
+
 
 M = size(xy,1);
 x = xy(:,1);
@@ -19,10 +21,16 @@ v = uv(:,2);
 %w=1 w'=1
 
 A=[vec_0 vec_0 vec_0 -x -y -vec_1 x.*v y.*v v;
-    x y vec_1 vec_0 vec_0 vec_0 -x.*u -y.*u u];
+    x y vec_1 vec_0 vec_0 vec_0 -x.*u -y.*u -u];
 
-svd(A)
+[~,~,V]=svd(A);
+H=V(:,end);
+H=reshape(H,3,3)';
+H=H./H(end,end);
 
-H=eye(3);
+% H=inv(T2)*H*T1;
+%to fit the other code which works with zeilenvektoren
+H=H';
+
 end
 

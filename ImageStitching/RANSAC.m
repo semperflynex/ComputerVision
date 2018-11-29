@@ -35,8 +35,9 @@ for i=1:N
         selectedPoints2(j,:)=points2(combinations(i,j),:);
     end
    %calculate the transform
-    newH=fitgeotrans(selectedPoints1,selectedPoints2, 'projective');
-    newH=newH.T;
+   newH=ProjectiveTransform(selectedPoints1,selectedPoints2);
+%     newH=fitgeotrans(selectedPoints1,selectedPoints2, 'projective');
+%     newH=newH.T;
     
     inlier=0;
     %evaluate H against all samples
@@ -78,8 +79,8 @@ sumError
 i-1
 
 % calculate new matrix
-newH=fitgeotrans(inliers1,inliers2, 'projective');
-newH=newH.T;
+newH=ProjectiveTransform(inliers1,inliers2);
+%newH=newH.T;
 
 
 %get the new error
