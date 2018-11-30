@@ -62,7 +62,7 @@ for i = 2:numel(images)
     %[relativeOrient, relativeLoc, inlierIdx] = helperEstimateRelativePose(...
         %matchedPoints1, matchedPoints2, cameraParams);
     [F, inlierIdx] = RANSAC_F_MATRIX(matchedPoints1,matchedPoints2);
-    E = A5cameraParams.IntrinsicMatrix * F * A5cameraParams.IntrinsicMatrix';
+    E = cameraParams.IntrinsicMatrix * F * cameraParams.IntrinsicMatrix';
     [relativeOrient, relativeLoc] = getCameraPose(E,cameraParams,matchedPoints1(inlierIdx,:), matchedPoints2(inlierIdx,:));
     % Add the current view to the view set.
     vSet = addView(vSet, i, 'Points', currPoints);
@@ -88,13 +88,14 @@ for i = 2:numel(images)
     % Get the table containing camera poses for all views.
     camPoses = poses(vSet);
 
+    xyzPoints = triangulateAllViews( tracks, camPoses, cameraParams );
     % Triangulate initial locations for the 3-D world points.
-    xyzPoints = triangulateMultiview(tracks, camPoses, cameraParams);
+    %xyzPoints = triangulateMultiview(tracks, camPoses, cameraParams);
     
     % Refine the 3-D world points and camera poses.
-    [xyzPoints, camPoses, reprojectionErrors] = bundleAdjustment(xyzPoints, ...
-        tracks, camPoses, cameraParams, 'FixedViewId', 1, ...
-        'PointsUndistorted', true);
+%     [xyzPoints, camPoses, reprojectionErrors] = bundleAdjustment(xyzPoints, ...
+%         tracks, camPoses, cameraParams, 'FixedViewId', 1, ...
+%         'PointsUndistorted', true);
 
     % Store the refined camera poses.
     vSet = updateView(vSet, camPoses);
@@ -110,8 +111,8 @@ end
     hold on
 
     % Exclude noisy 3-D points.
-    goodIdx = (reprojectionErrors < 5);
-    xyzPoints = xyzPoints(goodIdx, :);
+%     goodIdx = (reprojectionErrors < 5);
+%     xyzPoints = xyzPoints(goodIdx, :);
 
     % Display the 3-D points.
     pcshow(xyzPoints, 'VerticalAxis', 'y', 'VerticalAxisDir', 'down', ...
