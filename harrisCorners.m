@@ -1,19 +1,5 @@
-% Todo: Gaussian low-pass the image
-clc;
-workingDir = pwd;
-cd(workingDir);
-
-% Load images
-fCheckers=imread('images\checkers.jpg');
-fHM=imread('images\bild1.jpg');
-
-%[cornersCheckers, imgCheckers] = harrisCorners(fCheckers, 1, 1, 0.24, 0.1, 1);
-%figure, imshowpair(fCheckers, imgCheckers, 'montage');
-
-[cornersHM, imgHM] = harrisCorners(fHM, 1, 1, 0.24, 0.001, 1);
-figure, imshowpair(fHM, imgHM, 'montage');
-
 function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
+% Todo: Gaussian low-pass the image
 %
 % 'f'        :  RGB image to be analyzed
 %
@@ -74,7 +60,7 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
     end
 
     % Test other threshold formulation
-     T = T*max(R(:))
+     T = T*max(R(:));
     [rows, cols] = size(R);
     
     RThresholded = zeros(rows, cols);
