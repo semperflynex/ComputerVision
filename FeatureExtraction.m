@@ -1,97 +1,135 @@
 % Todo: Gaussian low-pass the image
-
 clc;
 workingDir = pwd;
 cd(workingDir);
 
-% Set parameters
-filtSize = 1;
-sigma = 1;
-k = 0.24;
-T = 0.1;
-supFactor = 2;
+% Load images
+fCheckers=imread('images\checkers.jpg');
+fHM=imread('images\bild1.jpg');
 
-% 0. Load image and transform to grayscale
-f=double(rgb2gray(imread('images\checkers.jpg')));
+%[cornersCheckers, imgCheckers] = harrisCorners(fCheckers, 1, 1, 0.24, 0.1, 1);
+%figure, imshowpair(fCheckers, imgCheckers, 'montage');
 
-% 1. Compute x and y derivatives of image
-[dx,dy] = meshgrid(-filtSize:filtSize, -filtSize:filtSize);
+[cornersHM, imgHM] = harrisCorners(fHM, 1, 1, 0.24, 0.001, 1);
+figure, imshowpair(fHM, imgHM, 'montage');
 
-fx = conv2(f,dx,'same');
-fy = conv2(f,dy,'same');
+function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
+%
+% 'f'        :  RGB image to be analyzed
+%
+% 'filtSite' :  Determines the size of the filter used for the derivate
+%               filter
+%
+% 'sigma'    :  
+%
+% 'k'        :  Sensitivity of corner detector. Small k -> more corners
+%               will be detected, large k -> less corners will be detected
+%
+% 'T'        :  Threshold value for corner detection
+%
+% 'supFactor":  Determines the size of the windows considered for maximum
+%               suppression
+%
+% The function returns 
 
-% 2. Compute products of derivatives at every pixel
-fx2 = fx.^2;
-fy2 = fy.^2;
-fxy = fx .* fy;
-
-% 3.  Compute the sums of the products of derivatives at each pixel
-weights = exp(-(dx.^2+dy.^2)/2*sigma);
-
-sumfx2 = conv2(fx2, weights, "same");
-sumfy2 = conv2(fy2, weights, "same");
-sumfxy = conv2(fxy, weights, "same");
-
-% 4. Define at each pixel the Matrix H
-[rows, cols] = size(fx2); 
-R = zeros(rows, cols);
-
-% for row = 1:rows
-%     for col = 1:cols
-%         H = [sumfx2(rows,cols) sumfxy(pixel); sumfxy(pixel) sumfy2(pixel)];
-
-
-for pixel = 1:numel(fx2)
-    H = [sumfx2(pixel) sumfxy(pixel); sumfxy(pixel) sumfy2(pixel)];
+    % Transform image to grayscale
+    f=rgb2gray(fRGB);
     
-    % 5. Compute the reponse of the detector at each pixel
-    r = det(H) - k * (trace(H))^2;   
+    % 1. Compute x and y derivatives of image
+    [dx,dy] = meshgrid(-filtSize:filtSize, -filtSize:filtSize);
+
+    fx = conv2(f,dx,'same');
+    fy = conv2(f,dy,'same');
+
+    % 2. Compute products of derivatives at every pixel
+    fx2 = fx.^2;
+    fy2 = fy.^2;
+    fxy = fx .* fy;
+
+    % 3.  Compute the sums of the products of derivatives at each pixel
+    weights = exp(-(dx.^2+dy.^2)/2*sigma);
+
+    sumfx2 = conv2(fx2, weights, "same");
+    sumfy2 = conv2(fy2, weights, "same");
+    sumfxy = conv2(fxy, weights, "same");
+
+    % 4. Define at each pixel the Matrix H
+    [rows, cols] = size(fx2);
+    R = zeros(rows, cols);
+
+    fDetected = f;
+
+    for pixel = 1:numel(fx2)
+        H = [sumfx2(pixel) sumfxy(pixel); sumfxy(pixel) sumfy2(pixel)];
+
+        % 5. Compute the reponse of the detector at each pixel
+        r = det(H) - k * (trace(H))^2;
+
+        % 6. Threshold on value of R
+         if(r > T)
+             [col, row]=ind2sub(size(fx2), pixel);
+             R(pixel) = r;
+             fDetected = insertMarker(fDetected, [row col]);
+         end
+    end
+
+    % Test other threshold formulation
+     T = T*max(R(:))
+    [rows, cols] = size(R);
     
-    % 6. Threshold on value of R
-    if(r > T)
-        [col, row]=ind2sub(size(fx2), pixel);
-        R(pixel) = r;
-        f = insertMarker(f, [row col]);
-    end 
-end
+    RThresholded = zeros(rows, cols);
+    
+    for row = 1:rows
+        for col = 1:cols
+            if R(row, col) > T
+                RThresholded(row, col) = R(row, col);
+            end
+        end
+     end
 
-[rows, cols] = size(R);
+    % 7. Compute nonmax suppression
+    [rows, cols] = size(RThresholded);
 
-for pixel = 1:numel(R)
-    % If found corner
-    if(R(pixel) > 0)
-        % Get Position
-        [col, row] = ind2sub(size(R), pixel);
-        [row col]
-        R(pixel)
-        supFactor
-        testArray = [(row - supFactor):(row + supFactor); (col - supFactor):(col + supFactor)];
-        % Iterate through rows arround corners position
-        for loopRow = (row - supFactor):(row + supFactor)
-            % Make sure to stay within arrays boundaries
-            if(loopRow < 1 || loopRow > rows)
-                % Skip if not
-                continue;
-            end 
-            % Iterate through cols arround corners position
-            for loopCol = (col - supFactor):(col + supFactor)
-                % Make sure to stay within arrays boundaries
-                if(loopCol < 1 || loopCol > cols)
-                    % Skip if not
-                    continue;
-                end 
-                if(R(pixel) < R(loopRow, loopCol))
-                    R(pixel) = 0;
+    for currentRow = 1:rows
+        for currentCol = 1:cols
+            % If found corner
+            if(RThresholded(currentRow, currentCol) > 0)
+                % checkArray = [(currentRow - supFactor):(currentRow + supFactor); (currentCol - supFactor):(currentCol + supFactor)];
+                % Iterate through rows arround corners position
+                for loopRow = (currentRow - supFactor):(currentRow + supFactor)
+                    % Make sure to stay within arrays boundaries
+                    if(loopRow < 1 || loopRow > rows)
+                        % Skip if not
+                        continue;
+                    end
+                    % Iterate through cols arround corners position
+                    for loopCol = (currentCol - supFactor):(currentCol + supFactor)
+                        % Make sure to stay within arrays boundaries
+                        if(loopCol < 1 || loopCol > cols)
+                            % Skip if not
+                            continue;
+                        end
+                        if(RThresholded(currentRow, currentCol) < RThresholded(loopRow, loopCol))
+                            RThresholded(currentRow, currentCol) = 0;
+                        end
+                    end
                 end
             end
-        end  
+        end
     end
+
+    fSuppressed = f;
+
+    for pixel = 1:numel(RThresholded)
+        if (RThresholded(pixel)>0)
+            [col, row]=ind2sub(size(RThresholded), pixel);
+            fSuppressed = insertMarker(fSuppressed, [row col]);
+        end
+    end
+
+    % Uncomment to visualize the difference between detected and finally accepted corners
+    % montage([fRGB, fDetected, fSuppressed])
+    
+    corners = RThresholded;
+    img = fSuppressed;
 end
-
-%figure, imshow(f);
-
-% We also want c to be a local maximum in a 9×9 neighborhood 
-% (with non-maximum suppression).
-% for each pixel, before applying non-maximum suppression 
-% (computing the local maximum).
-% 7. Compute nonmax suppression
