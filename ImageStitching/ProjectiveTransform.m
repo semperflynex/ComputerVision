@@ -1,5 +1,5 @@
 function [H] = ProjectiveTransform(xy,uv)
-%PROJECTIVETRANSFORM Summary of this function goes here
+%PROJECTIVETRANSFORM Calculates H Matrix for sets of Points
 % ohne strich =xy
 % x=x
 % y=y
@@ -28,7 +28,6 @@ H=V(:,end);
 H=reshape(H,3,3)';
 H=H./H(end,end);
 
-% H=inv(T2)*H*T1;
 %to fit the other code which works with zeilenvektoren
 H=H';
 

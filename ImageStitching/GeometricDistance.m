@@ -5,20 +5,12 @@ function [error] = GeometricDistance(H,x1,x2)
 % H = Homography Matrix
 % x1 = first Picture Correspondance
 % x2 = second Picture Correspondance
-
-x1=[x1 1];
-x2=[x2 1];
-
-Hx1=x1*H;
-Hx1=Hx1/Hx1(3); %normieren
+Hx1=TfH(x1,H);
 d1=x2-Hx1;
-d1(3)=0;
 d1=norm(d1);
 
-Hx2=x2*inv(H);
-Hx2=Hx2/Hx2(3);
+Hx2=TfH(x2,inv(H));
 d2=x1-Hx2;
-d2(3)=0;
 d2=norm(d2);
 
 error=d1^2+d2^2;

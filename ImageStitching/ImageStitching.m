@@ -1,8 +1,8 @@
 %% 
 % Bilder Laden:
 
-I1=rgb2gray(imread('..\images\bild1.jpg'));
-I2=rgb2gray(imread('..\images\bild3.jpg'));
+I1=rgb2gray(imread('..\images\bild3.jpg'));
+I2=rgb2gray(imread('..\images\bild2.jpg'));
 %% 
 % Feature Erkennung
 
@@ -18,7 +18,7 @@ corners2=detectSURFFeatures(I2);
 %% 
 % Finden von passenden features
 
-indexPairs = matchFeatures(features1, features2, 'Unique', true)
+indexPairs = matchFeatures(features1, features2, 'Unique', true);
 %% 
 % Nur jeweils eine Spalte der index Pairs
 
