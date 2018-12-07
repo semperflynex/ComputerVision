@@ -1,4 +1,4 @@
-function [bounds,corners] = getBounds(I,H)
+function [bounds] = getBounds(I,H)
 %GETBOUNDS [xMin yMin xMax yMax]
 
 
@@ -14,5 +14,4 @@ TMin=min(corners);
 TMax=max(corners);
 
 bounds=round([TMin,TMax]);
-corners
 end

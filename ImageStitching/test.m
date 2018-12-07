@@ -1,7 +1,7 @@
 clc;
 size(I1)
-[bounds1,corners1]=getBounds(I2',eye(3,3));
-[bounds2,corners2]=getBounds(I1',transform.T);
+[bounds1]=getBounds(I2',eye(3,3));
+[bounds2]=getBounds(I1',transform.T);
 bounds=[bounds1;bounds2];
 canvasBounds=[min(bounds(:,1:2)),max(bounds(:,3:4))];
 canvasSize=ceil(abs(min(bounds(:,1:2)) - max(bounds(:,3:4))))
