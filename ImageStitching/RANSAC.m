@@ -95,8 +95,7 @@ for n=1:c
             sumError=sumError+error;
         end
 end
-sumError
-i-1
+
 end
 
 %H=newH;

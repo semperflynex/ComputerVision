@@ -1,14 +1,12 @@
 clc;
-selectedPoints1=matchedPoints1(1:4).Location;
-selectedPoints2=matchedPoints2(1:4).Location;
+size(I1)
+[bounds1]=getBounds(I2',eye(3,3));
+[bounds2]=getBounds(I1',transform.T);
+bounds=[bounds1;bounds2];
+canvasBounds=[min(bounds(:,1:2)),max(bounds(:,3:4))];
+canvasSize=ceil(abs(min(bounds(:,1:2)) - max(bounds(:,3:4))))
+canvas=zeros(canvasSize,'uint8');
 
-
-H=fitgeotrans(selectedPoints1,selectedPoints2, 'projective');
-H=H.T
-
-myH=ProjectiveTransform(selectedPoints1,selectedPoints2)'
-
-
- for n=1:4
-      GeometricDistance(myH,selectedPoints1(n,:),selectedPoints2(n,:))
- end
+canvas=WarpImage(I2',bounds1,canvasBounds,canvas,eye(3,3));
+canvas=WarpImage(I1',bounds2,canvasBounds,canvas,transform.T);
+imshow(canvas');
