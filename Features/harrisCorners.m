@@ -3,7 +3,7 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
 %
 % 'f'        :  RGB image to be analyzed
 %
-% 'filtSite' :  Determines the size of the filter used for the derivate
+% 'filtSize' :  Determines the size of the filter used for the derivate
 %               filter
 %
 % 'sigma'    :  
@@ -19,11 +19,24 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
 % The function returns 
 
     % Transform image to grayscale
-    f=rgb2gray(fRGB);
+    if size(fRGB,3) == 3
+        f = rgb2gray(fRGB);
+    else
+        f = fRGB;
+    end
+    
+    % Perform image sharpening
+%     hSharp1 = [[0, -1, 0]; [-1, 4, -1]; [0, -1, 0]];
+%     hSharp2 = [[-1, -1, -1]; [-1, 8, -1]; [-1, -1, -1]];
+%     f = conv2(f, hSharp1,'same');
+%    figure; montage({f,f1,f2});
+    
     
     % 1. Compute x and y derivatives of image
     [dx,dy] = meshgrid(-filtSize:filtSize, -filtSize:filtSize);
 
+    
+    
     fx = conv2(f,dx,'same');
     fy = conv2(f,dy,'same');
 
@@ -42,7 +55,8 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
     % 4. Define at each pixel the Matrix H
     [rows, cols] = size(fx2);
     R = zeros(rows, cols);
-
+    RAngles = [[];[]];
+    AnglesForDrawing = [[];[]];
     fDetected = f;
 
     for pixel = 1:numel(fx2)
@@ -52,10 +66,13 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
         r = det(H) - k * (trace(H))^2;
 
         % 6. Threshold on value of R
-         if(r > T)
-             [col, row]=ind2sub(size(fx2), pixel);
-             R(pixel) = r;
-             fDetected = insertMarker(fDetected, [row col]);
+        borderLimit = 5; % cut of corners detected to close to image limits 
+        if(r > T)
+             [row, col]=ind2sub(size(fx2), pixel);%-------------------------------------------------------------------------------------------
+             if(row > borderLimit && row < size(fx,1)-borderLimit &&col > borderLimit && col < size(fx,2)-borderLimit)
+                 R(pixel) = r;
+                 fDetected = insertMarker(fDetected, [row col]);
+             end
          end
     end
 
@@ -69,6 +86,8 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
         for col = 1:cols
             if R(row, col) > T
                 RThresholded(row, col) = R(row, col);
+                AnglesForDrawing = [AnglesForDrawing; [row, col, fx(row, col), fy(row,col)]]; % AnglesForDrawing = [[row, col, dx, dy];...]
+                RAngles = [RAngles; [row, col, (atan(fy(row, col)/fx(row, col))*180/pi)]]; % RAngles = [[row, col, angle];...]
             end
         end
      end
@@ -108,14 +127,46 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor)
 
     for pixel = 1:numel(RThresholded)
         if (RThresholded(pixel)>0)
-            [col, row]=ind2sub(size(RThresholded), pixel);
-            fSuppressed = insertMarker(fSuppressed, [row col]);
+            [row, col]=ind2sub(size(RThresholded), pixel);
+            fSuppressed = insertMarker(fSuppressed, [col row]);
         end
     end
 
     % Uncomment to visualize the difference between detected and finally accepted corners
     % montage([fRGB, fDetected, fSuppressed])
     
-    corners = RThresholded;
+    % Generate output:
+    corners = struct;
+    corners.length = 0;
+    corners.coordinates = [[];[]];
+    corners.pixelIntens= [[];[]];
+    corners.image = RThresholded;
+       
+    % Length & Coordinates
+    [rows, cols] = size(RThresholded);
+    
+    for row = 1:rows
+        for col = 1:cols
+            if (RThresholded(row, col) > 0)
+                corners.length = corners.length + 1;
+                corners.coordinates = [corners.coordinates; [row, col]];
+                corners.pixelIntens = [corners.pixelIntens; f(row, col)];
+            end 
+        end
+    end
+    
+    % return marked image
     img = fSuppressed;
+    
+    % Visualize corner directions
+%     resize = 1;
+%     figure, imshow(fSuppressed); hold on;impixelinfo; 
+%     q1 = quiver(AnglesForDrawing(:,2),AnglesForDrawing(:,1),AnglesForDrawing(:,2)*resize,AnglesForDrawing(:,1)*resize);
+%     q1.Color = 'green';
+%     q1.LineWidth = 2;
+%     q2 = quiver(AnglesForDrawing(:,2),AnglesForDrawing(:,1),10*resize.*ones(length(AnglesForDrawing),1),tan(RAngles(:,3)*pi/180)*10*resize.* ones(length(AnglesForDrawing),1));
+%     AnglesForDrawingCalc = [AnglesForDrawing(:,1), AnglesForDrawing(:,2), 10*resize.*ones(length(AnglesForDrawing),1), tan(RAngles(:,3)*pi/180)*10*resize.* ones(length(AnglesForDrawing),1)]
+%     q2.Color = 'red';
+%     q2.LineWidth = 2;
+
 end
