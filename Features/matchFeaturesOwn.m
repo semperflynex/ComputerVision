@@ -1,4 +1,4 @@
-function matches = matchFeatures(f1, f2, features1, features2, n, T, overlap)
+function matches = matchFeaturesOwn(f1, f2, features1, features2, n, T, overlap)
     %
     % 'f1'          : First RGB image 
     %
@@ -15,8 +15,15 @@ function matches = matchFeatures(f1, f2, features1, features2, n, T, overlap)
     % 'overlap'     : Estimated overlap of the images, used as plausibility
     %                 check for matched features
     
-    f1 = double(rgb2gray(f1));
+    % Transform image to grayscale
+    if size(f1,3) == 3
+        f1 = double(rgb2gray(f1));
     f2 = double(rgb2gray(f2));
+    else
+        f1=double(f1);
+        f2=double(f2);
+    end
+    
     
     % Perform image sharpening -> Seems to make result even worse
 %     hSharp1 = [[0, -1, 0]; [-1, 4, -1]; [0, -1, 0]];

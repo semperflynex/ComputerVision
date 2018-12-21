@@ -6,9 +6,8 @@ function [H] = RANSAC(points1,points2,p,eta,s,t)
 % eta=estimated proportion of outliers
 % s= number of Points required for the Model
 % t= threshold distance (should be 5.99*sigma², but sigma is unknown)
-c=points1.Count;
-points1=points1.Location;
-points2=points2.Location;
+c=size(points1,1);
+
 %%
 %Determine the Number of random Samples minimally required
 % s= number of Points required for the Model

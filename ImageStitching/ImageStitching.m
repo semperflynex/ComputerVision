@@ -1,33 +1,39 @@
 %% 
 % Bilder Laden:
 
-I1=rgb2gray(imread('..\images\bild3.jpg'));
+I1=rgb2gray(imread('..\images\bild1.jpg'));
 I2=rgb2gray(imread('..\images\bild2.jpg'));
 %% 
-% Feature Erkennung
+% Feature Erkennung Matlab Methoden
 
 corners1=detectSURFFeatures(I1);
 corners2=detectSURFFeatures(I2);
-%% 
+
 % Feature Extraktion
 
-[features1,valid_corners1]=extractFeatures(I1,corners1);
-[features2,valid_corners2]=extractFeatures(I2,corners2);
-%figure;imshow(I1);hold on
-%plot(valid_corners1);
-%% 
-% Finden von passenden features
+[featuresML1,valid_corners1]=extractFeatures(I1,corners1);
+[featuresML2,valid_corners2]=extractFeatures(I2,corners2);
+ 
+indexPairs = matchFeatures(featuresML1, featuresML2, 'Unique', true);
 
-indexPairs = matchFeatures(features1, features2, 'Unique', true);
-%% 
-% Nur jeweils eine Spalte der index Pairs
+ %Nur jeweils eine Spalte der index Pairs
 
-matchedPoints1 = corners1(indexPairs(:,1), :);
-matchedPoints2 = corners2(indexPairs(:,2), :);   
+MlMp1 = corners1(indexPairs(:,1), :);
+MlMp2 = corners2(indexPairs(:,2), :);   
+MlMp1=MlMp1.Location;
+MlMp2=MlMp2.Location;
+%%
+%feature erkennung eigene Methoden
+[cornersHM1, MarkedImg1] = harrisCorners(I1, 1, 1, 0.24, 0.001, 1);
+[cornersHM2, MarkedImg2] = harrisCorners(I2, 1, 1, 0.24, 0.001, 1);
+%matching
+matches = matchFeaturesOwn(I1, I2, cornersHM1.coordinates, cornersHM2.coordinates, 8, 200000, 4/5);
+HmMp1=[matches(:,3),matches(:,2)]
+HmMp2=[matches(:,5),matches(:,4)]
 
 %%
 % perform RANSAC myself
-transform=RANSAC(matchedPoints1,matchedPoints2,0.99,0.5,4,1.5)
+transform=RANSAC(HmMp1,HmMp2,0.99,0.5,4,1.5)
 transform=projective2d(transform);
 
 %% Warp ans Stitch together
@@ -47,13 +53,8 @@ imshow(canvas');
 %% 
 % for Comparison:
 % Perform RANSAC from Matlab example library
-transform = estimateGeometricTransform(matchedPoints1, matchedPoints2,...
+transform = estimateGeometricTransform(MlMp1, MlMp2,...
         'projective', 'Confidence', 99.9, 'MaxNumTrials', 2000);
-    
-
-%%Create the Panorama form MAtlab example script
-% Use |imwarp| to map images into the panorama and use
-% |vision.AlphaBlender| to overlay the images together.
 
 height=480*2;
 width=640;
