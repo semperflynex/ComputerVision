@@ -1,0 +1,173 @@
+%------------------------------------------------------------------------------------------------------------------%
+% Präambel 
+
+% Dokumenteinstellungen
+\documentclass[a4paper,11pt]{scrartcl}
+
+% Packages
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage[headsepline, footsepline]{scrpage2}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{acronym}
+\usepackage[hidelinks]{hyperref} % Referenzen im Text erzeugen
+\usepackage[style=ieee, sorting=none, dashed=false]{biblatex}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage[font={small}]{caption}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{setspace}
+\bibliography{Literature.bib}
+
+
+% Zeilenabstand
+\makeatletter
+\newcommand{\MSonehalfspacing}{%
+	\setstretch{1.44}%  default
+	\ifcase \@ptsize \relax % 10pt
+	\setstretch {1.448}%
+	\or % 11pt
+	\setstretch {1.399}%
+	\or % 12pt
+	\setstretch {1.433}%
+	\fi
+}
+\makeatother
+\MSonehalfspacing
+
+% Seitenränder
+\geometry{
+	left=3cm,
+	right=3cm,
+	top=3cm,
+	bottom=4cm,
+	bindingoffset=5mm
+}
+
+% Einzug vor Absatz
+\parindent0mm
+
+% Kopf- und Fußzeile
+\pagestyle{scrheadings} % Aktiviere Kopf- und Fußzeilen
+
+\ihead{\headmark}
+\chead{}
+\ohead[\pagemark]{\pagemark}
+
+\automark[section]{chapter}
+
+\cfoot{}
+
+% Metadaten
+\title{Digital Image Processing}
+\author{Adam Mahmoud, Michael Wimmer, Philipp Kronser}
+\date{\today}
+
+%------------------------------------------------------------------------------------------------------------------%
+% Begin eigentliches Dokument
+\begin{document}
+%------------------------------------------------------------------------------------------------------------------%
+% Titelseite
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.5\textwidth]{Figures/LogoHM}\par
+	\vspace{1cm}
+	{\scshape\LARGE Hochschule München \par}
+	\vspace{1cm}
+	{\scshape\Large Digital Image Processing\par}
+	\vspace{1.5cm}
+	{\huge\bfseries Image Stitching and Point Cloud Generation from Smartphone Pictures\par}
+	\vspace{2cm}
+	Verfasst von\par
+	{\Large\itshape Adam Mahmoud\\ Michael Wimmer \\ Philipp Kronser\par}
+	\vfill
+	Vorgelegt bei\par
+	Prof. Dr. Claudius \textsc{Schnörr}
+	
+	\vfill
+	
+	% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+\clearpage
+%------------------------------------------------------------------------------------------------------------------%
+% Abkürzungsverzeichnis
+\section*{Abkürzungsverzeichnis} %Abkürzungsverzeichnis 
+
+\addcontentsline{toc}{section}{Abkürzungsverzeichnis}
+
+\begin{acronym}[VeryLongAndUsefullStuff]
+	\acro{BOM}{Bill of Materials}
+	\acro{BTC}{Bitcoin}
+	\acro{CAD}{Computer-Aided Design}
+	\acro{DApp}{Dezentralisierte Apps}
+	\acro{DRM}{Design Research Methodology}
+	\acro{ETH}{Ether}
+	\acro{ERP}{Enterprise Ressource Planning}
+	\acro{EVM}{Ethereum Virtual Machine}
+	\acro{PDM}{Product Data Management}
+	\acro{PLM}{Product Lifecycle Management}
+	\acro{PoS}{Proof of Stake}
+	\acro{PoW}{Proof of Work}
+	\acro{STEP}{Standard for the exchange of product model data}
+\end{acronym}
+
+\clearpage
+
+%------------------------------------------------------------------------------------------------------------------%
+% Inhaltsverzeichnis 
+\begin{spacing}{1.25}
+	\tableofcontents
+\end{spacing}
+
+%{\small\tableofcontents}
+
+\clearpage
+%------------------------------------------------------------------------------------------------------------------%
+
+
+% Weitere Kapitel
+\input{Chapters/[1]Einleitung}
+\input{Chapters/[2]DeskriptivePhaseI}
+\input{Chapters/[3]PreskriptivePhase}
+\input{Chapters/[4]DeskriptivePhaseII}
+\input{Chapters/[5]Anhang}
+
+%------------------------------------------------------------------------------------------------------------------%
+% Literaturverzeichnis
+\addcontentsline{toc}{section}{Literaturverzeichnis}
+\begin{spacing}{1.3}
+	\printbibliography
+	\clearpage
+\end{spacing}
+
+%------------------------------------------------------------------------------------------------------------------%
+% Erklärung
+\thispagestyle{plain}
+\vspace*{\fill}
+\fbox{\parbox{\linewidth}{
+	\vspace{0.35cm}
+	\textbf{Erklärung}
+	
+	\par \bigskip
+	Hiermit erkläre ich gemäß der Rahmenprüfungsordnung der Hochschule München, dass ich die vorliegende Arbeit mit dem Titel ``Implementierung einer Blockchain-Anwendung zur Steigerung der Integrität von CAD-Metadaten'' selbstständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen oder Hilfsmittel benutzt sowie wörtliche und sinngemäßge Zitate als solche gekennzeichnet habe.
+	
+	\par \bigskip
+	München, den~\rule[-1mm]{3cm}{0.2mm} \hfill Unterschrift \rule[-1mm]{4cm}{0.2mm}
+	\vspace{0.35cm}
+}}
+\vspace*{\fill}
+
+
+\end{document}
