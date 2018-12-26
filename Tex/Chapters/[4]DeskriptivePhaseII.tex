@@ -182,7 +182,11 @@ $A = \begin{pmatrix} xp^{3T} - p^{1T} \\ yp^{3T} - p^{2T} \\ x'p'^{3T} - p'^{1T}
 \\
 Mit $p^i$ wird hier die i-te Zeile der Kameramatrix P bezeichnet. Die Punke x,y und x’,y’ die korrespondierenden Bildpunkte in Pixeln. Wird nur zwischen zwei Kameras trianguliert, so kann A genau wie in der Formel erstellt werden. Wird zwischen mehreren Kameras trianguliert, wie am Ende des Gesamtalgorithmus so kann A analog zu Abbildung X aufgebaut werden, mit jeweils 2 weiteren Zeilen für jede weitere Kamera.
 Die Lösung für X wird über die homogene Methode ermittelt, indem A mittels Singulärwertzerlegung wieder in die 3 Matrizen U,D und V zerlegt wird. Die Lösung ist hier wieder korrespondierend zum kleinsten Singulärwert und daher, bei absteigender Größe der Singulärwerte in D,  in der letzten Spalte von V zu finden.
-
+\\
+$A = UDV$
+\\
+$X = V(end)$
+\\
 
 \clearpage
 
