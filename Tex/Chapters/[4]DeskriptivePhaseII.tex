@@ -35,7 +35,7 @@ Es gibt zwei Arten von Verzeichnungsfehlern, die tangentiale und die radiale. Di
     }
     \caption{Auswirkung von Verzeichnung (links radial, rechts tangential) \cite{Verlag}}
 \end{figure}
-\\
+
 Matlab bietet eine Applikation die aus Bildern von einem Kalibrierungsboard die Kameraparameter schätzt. Dazu muss das Board aus vielen verschiedenen Positionen (ca. 20) fotographiert werden. 
 
 \begin{figure}[ht]
@@ -171,7 +171,7 @@ $R_2, -t$
 Um zu prüfen welche Kameraposen die richtigen sind wird nun für jede Kombination eine Triangulierung der Inlier aus der Fundamentalmatrix Berechnung durchgeführt. Die erste Kamera befindet sich dabei im Nullpunkt mit der Orientierung eye(3), die zweite hat jeweils eine der vier möglichen Lösungen. Die genaue Vorgehensweise der Triangulation wird im nächsten Kapitel beschrieben. Bei der der Realität entsprechende Lösung, müssten (fast) alle in den 3D Raum triangulierten Punkte vor beiden Kameras liegen, bei den falschen Lösungen müssten sie hinter mindestens einer Kamera liegen. Zum Schluss werden die als richtig ermittelte Lösung noch in das Koordinatensystem der ersten Kamera überführt, indem die Rotationsmatrix transpo-niert wird und diese auf den Translationsvektor multipliziert wird. Dann werden sie als Pose der zweiten Kamera relativ zur ersten zurückgegeben. \cite{Richard2000} \cite{LTH2013}
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.6]{Figures/validierungDerLosungen.PNG}
+    \includegraphics[scale=0.6]{Figures/validierungDerLoesungen.PNG}
     \caption{4 mögliche Lösungen \cite{LTH2013}}
 \end{figure}
 
