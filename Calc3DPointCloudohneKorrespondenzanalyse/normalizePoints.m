@@ -1,6 +1,10 @@
+%Funktion zum normalisieren der korrespondierenden Punktepaare. Die Punkte
+%werden um den Koordinatenursprung herum verteilt und werden so skaliert
+%dass sie im quadratischen Mittel eine Abweichung von sqrt(2) haben.
+%Autor:  Michael Wimmer
 function [ normedPoints1,normedPoints2, T1, T2  ] = normalizePoints( matchedPoints1,matchedPoints2 )
 
-%Es müssen gleich viele Punkte und über 3 sein
+%Prüfen ob gleich viele Punkte und über 3
 if length(matchedPoints1) == length(matchedPoints2) && length(matchedPoints1) > 3
     points1 = matchedPoints1;
     points2 = matchedPoints2;
