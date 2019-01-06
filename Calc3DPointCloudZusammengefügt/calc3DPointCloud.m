@@ -53,10 +53,9 @@ for i = 2:numel(images)
 %     matchedPoints2 = currPoints(indexPairs(:, 2));
     [corners2, img2] = harrisCorners(I2, 1, 1, 0.24, 0.001, 1);
     matches = matchFeaturesOwn(I2, I, corners2.coordinates, corners.coordinates, 'SSD', 8, 200000, 2/5, 0.9); 
-    matchedPoints1 = [matches(:,3),matches(:,2)];
-    matchedPoints2 = [matches(:,5),matches(:,4)];
+    matchedPoints2 = [matches(:,3),matches(:,2)];
+    matchedPoints1 = [matches(:,5),matches(:,4)];
     %Schätzen der Fundamentalmatrix
-    %[F, inlierIdx] = RANSAC_F_MATRIX(matchedPoints1,matchedPoints2);
     [F, inlierIdx] = RANSAC_F_MATRIX( matchedPoints1,matchedPoints2);
     %Extrahieren der Essenziellen Matrix aus der geschätzten
     %Fundamentalmatrix
@@ -66,7 +65,8 @@ for i = 2:numel(images)
 
     %Hinzufügen der neuen Pose und deren Punkte in ViewSet
     vSet = addView(vSet, i, 'Points',  [corners2.coordinates(:,2), corners2.coordinates(:,1)]);
-    %vSet = addConnection(vSet, i-1, i, 'Matches', indexPairs(inlierIdx,:));
+    indexPairs = getIndexPairs(corners,corners2, matchedPoints1, matchedPoints2);   
+    vSet = addConnection(vSet, i-1, i, 'Matches', indexPairs(inlierIdx,:));
     prevPose = poses(vSet, i-1);
     prevOrientation = prevPose.Orientation{1};
     prevLocation    = prevPose.Location{1};
