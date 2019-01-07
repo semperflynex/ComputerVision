@@ -27,7 +27,7 @@ MlMp2=MlMp2.Location;
 [cornersHM1, MarkedImg1] = harrisCorners(I1, 1, 1, 0.24, 0.001, 1);
 [cornersHM2, MarkedImg2] = harrisCorners(I2, 1, 1, 0.24, 0.001, 1);
 %matching
-matches = matchFeaturesOwn(I1, I2, cornersHM1.coordinates, cornersHM2.coordinates, 8, 200000, 4/5);
+matches = matchFeaturesOwn(I1, I2, cornersHM1.coordinates, cornersHM2.coordinates,'SSD', 8, 200000, 4/5,0.9);
 HmMp1=[matches(:,3),matches(:,2)]
 HmMp2=[matches(:,5),matches(:,4)]
 
