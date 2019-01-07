@@ -15,25 +15,46 @@ function SSD = calcSSD(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
     % 'overlap'     : Estimated overlap of the images, used as plausibility
     %                 check for matched features
     
+
+    n = floor(n/2);
+    
     rows1 = size(feat1,1);
     rows2 = size(feat2,1);
     [imgRows1, imgCols1] = size(f1);
     [imgRows2, imgCols2] = size(f2);
     SSD = [[];[]]; % All SSD = [[ssd, row1, col1, row2, col2, distance]; ...]
-    SSD1 = [[];[]];
 
     %% Calculate SSDs of all feature's windows
     for row1 = 1:rows1
-        %% Calculate all SSDs for selected feature
+        %% Calculate all SSDs for selected feature 1/2
         SSDelement = [[];[]]; 
         zeile1 = feat1(row1, 1);
         spalte1 = feat1(row1, 2);
         for row2 = 1:rows2
+%% Filter by overlap
+            % Set overlap plausibility parameters
+            tolerance = 0;
+            shiftX = (1-overlapX) * size(f1,2) + tolerance;
+            shiftY = (1-overlapY) * size(f1,1) + tolerance;
+
+            y1 = feat1(row1, 1);
+            x1 = feat1(row1, 2);
+            y2 = feat2(row2, 1);
+            x2 = feat2(row2, 2);
+
+            % Image shift
+            if abs(x1-x2) > shiftX
+                continue
+            end
+            if abs(y1-y2) > shiftY
+                continue
+            end
+%% Calculate all SSDs for selected feature 2/2
             ssd = 0;
             zeile2 = feat2(row2, 1);
             spalte2 = feat2(row2, 2);
             for xshift = -n:n
-                % check if x in pictur
+                % check if x in picture
                 if (zeile1+xshift < 1 || zeile1+xshift > imgRows1 || zeile2+xshift < 1 || zeile2+xshift > imgRows2)
                     continue;
                 end
@@ -49,6 +70,9 @@ function SSD = calcSSD(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
         end
         
         %% Select best match by minimal SSD
+        if 1 == isempty(SSDelement)
+            continue;
+        end
         [val, ind] = min(SSDelement(:,1));
         bestMatch = SSDelement(ind, :); % bestMatch = [ssd, row1, col1, row2, col2]
         
@@ -58,24 +82,24 @@ function SSD = calcSSD(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
             continue;
         end
         
-        %% Filter by overlap
-        % Set overlap plausibility parameters
-        tolerance = 0;
-        shiftX = (1-overlapX) * size(f1,2) + tolerance;
-        shiftY = (1-overlapY) * size(f1,1) + tolerance;
-        
-        y1 = bestMatch(1, 2);
-        x1 = bestMatch(1, 3);
-        y2 = bestMatch(1, 4);
-        x2 = bestMatch(1, 5);
-        
-        % Image shift
-        if abs(x1-x2) > shiftX
-            continue
-        end
-        if abs(y1-y2) > shiftY
-            continue
-        end
+%         %% Filter by overlap
+%         % Set overlap plausibility parameters
+%         tolerance = 0;
+%         shiftX = (1-overlapX) * size(f1,2) + tolerance;
+%         shiftY = (1-overlapY) * size(f1,1) + tolerance;
+%         
+%         y1 = bestMatch(1, 2);
+%         x1 = bestMatch(1, 3);
+%         y2 = bestMatch(1, 4);
+%         x2 = bestMatch(1, 5);
+%         
+%         % Image shift
+%         if abs(x1-x2) > shiftX
+%             continue
+%         end
+%         if abs(y1-y2) > shiftY
+%             continue
+%         end
         
         %% Filter double matches
         % If Länge SSD == 0, füge hinzu

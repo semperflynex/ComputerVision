@@ -1,4 +1,4 @@
-function matches = matchFeaturesOwn(f1, f2, features1, features2, method, n, T, overlapX, overlapY)
+function matches = matchFeaturesOwn(f1, f2, features1, features2, method, n, T, overlapX, overlapY, blur)
 %
 % 'f1'          : First RGB image 
 %
@@ -39,6 +39,22 @@ end
 % Rotation Invariance
 %rotated = rotatePatch()
 
+%% __Experimental___
+switch blur
+    case 'on'
+        sigma = 3;
+        s = 9;
+        s = floor(s/2);
+        [x,y] = meshgrid(-s:s, -s:s);
+        
+        % Smoothing the image
+        gaussSmoothing =1/(2*pi*sigma) *  exp(-(x.^2 + y.^2)/(2*sigma^2));
+        f1 = conv2(f1,gaussSmoothing,'same');
+        f2 = conv2(f2,gaussSmoothing,'same');
+end
+
+%% _________________
+
 switch method
     case 'NCC'
         % Calculate normalized cross correlation (NCC)
@@ -60,18 +76,6 @@ switch method
         % Calculate mean absolte error (MAE)
         MAE = calcMAE(f1,f2, features1, features2, n, T, overlapX, overlapY);
         matches = MAE;
-    case 'all'
-        % Calculate normalized cross correlation (NCC)
-        %NCC = calcNCC
-        % Calculate sum of squared differences (SSD)
-        SSD = calcSSD(f1,f2, features1, features2, n, T, overlap);
-        % Calculate sum of absolute differences (SAD)
-        %SAD = calcSAD()
-        % Calculate mean square error (MSE)
-        %MSE = calcMSE();
-        % Calculate mean absolte error (MAE)
-        %MAE = calcMAE();
-        % Create descriptor
 end
 % Rank transform the image
 %rT = calcRankTransform()

@@ -15,6 +15,9 @@ function MSE = calcMSE(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
     % 'overlap'     : Estimated overlap of the images, used as plausibility
     %                 check for matched features
     
+
+    n = floor(n/2);
+    
     rows1 = size(feat1,1);
     rows2 = size(feat2,1);
     [imgRows1, imgCols1] = size(f1);
@@ -29,6 +32,25 @@ function MSE = calcMSE(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
         zeile1 = feat1(row1, 1);
         spalte1 = feat1(row1, 2);
         for row2 = 1:rows2
+%% Filter by overlap
+            % Set overlap plausibility parameters
+            tolerance = 0;
+            shiftX = (1-overlapX) * size(f1,2) + tolerance;
+            shiftY = (1-overlapY) * size(f1,1) + tolerance;
+
+            y1 = feat1(row1, 1);
+            x1 = feat1(row1, 2);
+            y2 = feat2(row2, 1);
+            x2 = feat2(row2, 2);
+
+            % Image shift
+            if abs(x1-x2) > shiftX
+                continue
+            end
+            if abs(y1-y2) > shiftY
+                continue
+            end
+%% Calculate all MSEs for selected feature 2/2
             mse = 0;
             count = 0;
             zeile2 = feat2(row2, 1);
@@ -52,6 +74,9 @@ function MSE = calcMSE(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
         end
         
         %% Select best match by minimal MSE
+        if 1 == isempty(MSEelement)
+            continue;
+        end
         [val, ind] = min(MSEelement(:,1));
         bestMatch = MSEelement(ind, :); % bestMatch = [mse, row1, col1, row2, col2]
         
@@ -61,24 +86,24 @@ function MSE = calcMSE(f1,f2, feat1, feat2, n, T, overlapX, overlapY)
             continue;
         end
         
-        %% Filter by overlap
-        % Set overlap plausibility parameters
-        tolerance = 0;
-        shiftX = (1-overlapX) * size(f1,2) + tolerance;
-        shiftY = (1-overlapY) * size(f1,1) + tolerance;
-        
-        y1 = bestMatch(1, 2);
-        x1 = bestMatch(1, 3);
-        y2 = bestMatch(1, 4);
-        x2 = bestMatch(1, 5);
-        
-        % Image shift
-        if abs(x1-x2) > shiftX
-            continue
-        end
-        if abs(y1-y2) > shiftY
-            continue
-        end
+%         %% Filter by overlap
+%         % Set overlap plausibility parameters
+%         tolerance = 0;
+%         shiftX = (1-overlapX) * size(f1,2) + tolerance;
+%         shiftY = (1-overlapY) * size(f1,1) + tolerance;
+%         
+%         y1 = bestMatch(1, 2);
+%         x1 = bestMatch(1, 3);
+%         y2 = bestMatch(1, 4);
+%         x2 = bestMatch(1, 5);
+%         
+%         % Image shift
+%         if abs(x1-x2) > shiftX
+%             continue
+%         end
+%         if abs(y1-y2) > shiftY
+%             continue
+%         end
         
         %% Filter double matches
         % If Länge MSE == 0, füge hinzu
