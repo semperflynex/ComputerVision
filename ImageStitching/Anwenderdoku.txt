@@ -1,0 +1,8 @@
+Anwenderdoku zum Verwenden des Skripts:
+
+ImageStitching.m ist das Hauptprogramm, alle anderen Dateien sind Unterprogramme.
+ImageStitching.m kann in Matlab direkt ausgeführt werden.
+
+Für das Skript befinden sich Beispielbilder im Ordner "images"
+Diese können gerne durch Eigene ersetzt werden.
+
