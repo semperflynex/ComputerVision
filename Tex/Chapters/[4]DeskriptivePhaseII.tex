@@ -23,7 +23,7 @@ Das gesamte Vorgehen wird hier nocheinmal im Pseudocode zusammengefasst.
 \subsection{Kamerakalibrierung}
 \label{sec:Kamerakalibrierung}
 Die Kalibrierung der Kamera ist wichtig, da die Abbildung jeder Kamera ein wenig anders ist. So unterscheiden sich zum Beispiel die Brennweiten von Gerät zu Gerät geringfügig und jede Kamera hat ihre eigenen Verzeichnungsfehler.
-Es gibt zwei Arten von Verzeichnungsfehlern, die tangentiale und die radiale. Die radiale Verzeichnung entsteht durch die Krümmung der Linse bzw. kleine Unebenheiten die bei der Produktion entstanden sind. Die Tangentiale Verzeichnung entsteht dadurch dass der Fotochip nicht exakt parallel zur Linse eingebaut wurde. Die Folgenden Bilder zeigen die Auswirkungen von tangentialer und radialer Verzeichnung.\cite{Verlag}
+Es gibt zwei Arten von Verzeichnungsfehlern, die tangentiale und die radiale. Die radiale Verzeichnung entsteht durch die Krümmung der Linse bzw. kleine Unebenheiten die bei der Produktion entstanden sind. Die tangentiale Verzeichnung entsteht dadurch dass der Fotochip nicht exakt parallel zur Linse eingebaut wurde. Die Folgenden Bilder zeigen die Auswirkungen von tangentialer und radialer Verzeichnung.\cite{Verlag}
 
 \begin{figure}[ht]
 \centering
@@ -92,8 +92,10 @@ mit
 $$A = [x'x, x'y, x', y'x, y'y, y', x,y,1]$$
 und
 $$f = [f11,f12,f13,f21,f22,f23,f31,f32,f33]^T$$
-Die Fundamentalmatrix hat trotz ihrer 9 Einträge lediglich 7 Freiheitsgrade, da sie nur bis auf ihren Skalierungsfaktor definiert ist und die Bedingung an sie gestellt wird dass sie den Rang 2 aufweist. Daher kann mit mindestens 8 korrespondierenden Punktepaaren über die Singulärwertzerlegung eine Lösung für f gefunden werden. Diese ist der Singulärvektor der zum kleinsten Singulärwert von A korrespondiert. Die Singulärwerte befinden sich in der Diagonalmatrix D. Zerlegt man A mittels Singulärwertzerlegung in UDV, so ist die Lösung in der letzten Spalte von V zu finden.
-Für eine ideale Fundamentalmatrix müsste nach einer Singulärwertzerlegung gelten:
+Die Fundamentalmatrix hat trotz ihrer 9 Einträge lediglich 7 Freiheitsgrade, da sie nur bis auf ihren Skalierungsfaktor definiert ist und die Bedingung an sie gestellt wird dass ihre Determinante 0 ist. Daher kann mit mindestens 8 korrespondierenden Punktepaaren über die Singulärwertzerlegung eine Lösung für f gefunden werden. Diese ist der Singulärvektor der zum kleinsten Singulärwert von A korrespondiert. Die Singulärwerte befinden sich in der Diagonalmatrix D. Zerlegt man A mittels Singulärwertzerlegung in UDV, so ist die Lösung in der letzten Spalte von V zu finden.
+$$f = \begin{pmatrix} V_{1,end} & V_{2,end} & V_{3,end}\\V_{4,end} & V_{5,end} & V_{6,end} \\V_{7,end} & V_{8,end} & V_{9,end} \end{pmatrix} $$
+
+Für eine ideale Fundamentalmatrix müsste nach einer Singulärwertzerlegung von f gelten:
 $$D_{ideal} = \begin{pmatrix} \sigma_1 & 0 & 0\\0 & \sigma_2 & 0 \\0 & 0 & 0 \end{pmatrix}$$
 Dies wird in der Realität nicht vorkommen, da hier mit diskreten Pixeln gearbeitet wird und so nie die ideale Fundamentalmatrix berechnet werden kann.
 $$D_{real} = \begin{pmatrix} \sigma_1 & 0 & 0\\0 & \sigma_2 & 0 \\0 & 0 & \sigma_3 \end{pmatrix}$$
@@ -159,6 +161,27 @@ Mit $p^i$ wird hier die i-te Zeile der Kameramatrix P bezeichnet. Die Punke x,y 
 Die Lösung für X wird über die homogene Methode ermittelt, indem A mittels Singulärwertzerlegung wieder in die 3 Matrizen U,D und V zerlegt wird. Die Lösung ist hier wieder korrespondierend zum kleinsten Singulärwert und daher, bei absteigender Größe der Singulärwerte in D,  in der letzten Spalte von V zu finden. \cite{Richard2000}
 $$A = UDV$$
 $$X = V(end)$$
+
+\subsection{Ergebnisse}
+Mittels dieser Algorithmen sollte aus folgender Bildfolge eine Punktwolke gerechnet werden:
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.03]{Figures/Bildserie.jpg}
+    \caption{Bildserie}
+\end{figure}
+\\
+\\
+\\
+\\
+\\
+\\
+Leider konnte über eine Korrespondenzanalyse über den Harris Corner Detector kein zufriedenstellendes Ergebnis erzielt werden. Entweder die Anzahl gefundener markanter Punkte war zu gering, oder es wurden zu viele markante Punkte als korrespondierend angesehen die es nicht waren. Um die nachfolgenden Algorithmen zu testen wurde die Funktion 'detectSurfFeatures' aus der Matlab Computervision Toolbox verwendet. Hier konnte als Ergebnis die Ecke der Hauswand grob als 3D Punktwolke berechnet werden.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.4]{Figures/ErgebnisZusammen.png}
+    \caption{Ergebnis Punktwolke}
+\end{figure}
 
 \clearpage
 
