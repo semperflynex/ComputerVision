@@ -1,8 +1,8 @@
 %% 
 % Bilder Laden:
 
-I1=rgb2gray(imread('..\images\bild1.jpg'));
-I2=rgb2gray(imread('..\images\bild2.jpg'));
+I1=rgb2gray(imread('images\bild1.jpg'));
+I2=rgb2gray(imread('images\bild2.jpg'));
 %% 
 % Feature Erkennung Matlab Methoden
 
