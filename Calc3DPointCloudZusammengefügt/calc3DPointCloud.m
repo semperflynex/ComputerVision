@@ -3,19 +3,19 @@
 function calc3DPointCloud
 %Eingabe des Pfades unter dem die Bilddateien liegen (Bildreihenfolge
 %alphabetisch nach Bildname)
-imds = imageDatastore('C:\Users\Michi\Dropbox\Michi Uniordner\Master\3.Semester\Computervision\Calc3DPointCloudVersuchZusammen');
-
+imds = imageDatastore('C:\Users\phili\Desktop\S3 Bilder\Boxen');
 
 %Konvertieren der Bilder in Grauwertbilder
 images = cell(1, numel(imds.Files));
 for i = 1:numel(imds.Files)
     I = readimage(imds, i);
+    %I = imrotate(I, 270);
     images{i} = rgb2gray(I);
+    %figure, imshow(I);
 end
 %Laden der Kameraparameter
-load('smallCameraParams.mat');
-
-I = undistortImage(images{1}, smallCameraParams); 
+load('S3cameraParams.mat');
+I = undistortImage(images{1}, cameraParameters); 
 
 % Detect features. Increasing 'NumOctaves' helps detect large-scale
 % features in high-resolution images. Use an ROI to eliminate spurious
@@ -24,7 +24,7 @@ I = undistortImage(images{1}, smallCameraParams);
 % roi = [border, border, size(I, 2)- 2*border, size(I, 1)- 2*border];
 % prevPoints   = detectSURFFeatures(I, 'NumOctaves', 8, 'ROI', roi);
 % prevFeatures = extractFeatures(I, prevPoints, 'Upright', true);
-[corners, img] = harrisCorners(I, 1, 1, 0.24, 0.001, 1);
+[corners, img] = harrisCorners(I, 1, 1, 0.18, 3000000, 1, 'off');
 
 %Erstellen der ViewSet Datenstruktur zum Speichern aller Kameraposen und
 %zugehörigen Punkte
@@ -39,7 +39,7 @@ vSet = addView(vSet, viewId, 'Points', [corners.coordinates(:,2), corners.coordi
 %Iterieren über alle Bilder ab dem zweiten
 for i = 2:numel(images)
     i
-    I2 = undistortImage(images{i}, smallCameraParams);
+    I2 = undistortImage(images{i}, cameraParameters);
     
 %     % Detect, extract and match features.
 %     currPoints   = detectSURFFeatures(I, 'NumOctaves', 8, 'ROI', roi);
@@ -51,17 +51,23 @@ for i = 2:numel(images)
 %     % Select matched points.
 %     matchedPoints1 = prevPoints(indexPairs(:, 1));
 %     matchedPoints2 = currPoints(indexPairs(:, 2));
-    [corners2, img2] = harrisCorners(I2, 1, 1, 0.24, 0.001, 1);
-    matches = matchFeaturesOwn(I2, I, corners2.coordinates, corners.coordinates, 'SSD', 8, 200000, 2/5, 0.9); 
+    [corners2, img2] = harrisCorners(I2, 1, 1, 0.18, 3000000, 1, 'off');
+    % Parameters for matching
+    windowSize = 7;
+    threshold = 3000000;
+    xOverlap = 0.6;
+    yOverlap = 0.9;
+    blur = 'off';
+    matches = matchFeaturesOwn(I2, I, corners2.coordinates, corners.coordinates,'SSD', windowSize, threshold, xOverlap, yOverlap, blur);
     matchedPoints2 = [matches(:,3),matches(:,2)];
     matchedPoints1 = [matches(:,5),matches(:,4)];
     %Schätzen der Fundamentalmatrix
     [F, inlierIdx] = RANSAC_F_MATRIX( matchedPoints1,matchedPoints2);
     %Extrahieren der Essenziellen Matrix aus der geschätzten
     %Fundamentalmatrix
-    E = smallCameraParams.IntrinsicMatrix * F * smallCameraParams.IntrinsicMatrix';
+    E = S3cameraParams.IntrinsicMatrix * F * S3cameraParams.IntrinsicMatrix';
     %Extrahieren der Kamerapose aus der Essenziellen Matrix
-    [relativeOrient, relativeLoc] = getCameraPose(E,smallCameraParams,matchedPoints1(inlierIdx,:), matchedPoints2(inlierIdx,:));
+    [relativeOrient, relativeLoc] = getCameraPose(E,S3cameraParams,matchedPoints1(inlierIdx,:), matchedPoints2(inlierIdx,:));
 
     %Hinzufügen der neuen Pose und deren Punkte in ViewSet
     vSet = addView(vSet, i, 'Points',  [corners2.coordinates(:,2), corners2.coordinates(:,1)]);
@@ -88,7 +94,7 @@ end
     tracks = findTracks(vSet);
     %Trianguliere über alle gefundenen Tracks um alle Punkte in 3D zu
     %erhalten
-    xyzPoints = triangulateAllViews( tracks, camPoses, smallCameraParams );
+    xyzPoints = triangulateAllViews( tracks, camPoses, S3cameraParams );
 
     %Plotten der Kameraposen und 3D Punkte  
     figure;  

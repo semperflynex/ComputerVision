@@ -6,39 +6,38 @@ cd(workingDir);
 %% Load image(s)
 %fHM1=imread('..\images\03pic.jpg');
 %fHM2=imread('..\images\04pic.jpg');
-fHM1=imread('C:\Users\phili\Desktop\S3 Bilder\Steinecke\01.jpg');
-fHM2=imread('C:\Users\phili\Desktop\S3 Bilder\Steinecke\02.jpg');
+fHM1=imread('C:\Users\phili\Desktop\S3 Bilder\AndereGruppe\02.jpeg');
+fHM2=imread('C:\Users\phili\Desktop\S3 Bilder\AndereGruppe\01.jpeg');
 
 % resize and scale large images for faster processing
 %fHM1 = imresize(fHM1, 0.3);
 %fHM2 = imresize(fHM2, 0.3);
-fHM1 = imrotate(fHM1, 270);
-fHM2 = imrotate(fHM2, 270);
+%fHM1 = imrotate(fHM1, 270);
+%fHM2 = imrotate(fHM2, 270);
 
-figure, montage({fHM1, fHM2});
-
-impixelinfo;
+%figure, montage({fHM1, fHM2});
+%impixelinfo;
 
 %% Detect features
-[cornersHM1, imgHM1] = harrisCorners(fHM1, 1, 1, 0.24, 2000000, 1, 'off');
+[cornersHM1, imgHM1] = harrisCorners(fHM1, 1, 1, 0.05, 1e9, 1, 'on');
 cornersHM1.length
-[cornersHM2, imgHM2] = harrisCorners(fHM2, 1, 1, 0.24, 2000000, 1, 'off');
+[cornersHM2, imgHM2] = harrisCorners(fHM2, 1, 1, 0.05, 1e9, 1, 'on');
 cornersHM2.length
 % Show detected features
 %figure, montage({imgHM1, imgHM2});impixelinfo;  
 
 %% Match Features windowsize 7
-windowSize = 7;
-threshold = 100000;
-thresholdNCC = 0.8;
+windowSize = 20;
+threshold = 10000;
+thresholdNCC = 1;
 xOverlap = 0.6;
 yOverlap = 0.9;
 blur = 'off';
-matches1 = matchFeaturesOwn(fHM1, fHM2, cornersHM1.coordinates, cornersHM2.coordinates,'SSD', windowSize, threshold, xOverlap, yOverlap, blur);
-matches2 = matchFeaturesOwn(fHM1, fHM2, cornersHM1.coordinates, cornersHM2.coordinates,'SAD', windowSize, threshold, xOverlap, yOverlap, blur);
-matches3 = matchFeaturesOwn(fHM1, fHM2, cornersHM1.coordinates, cornersHM2.coordinates,'MAE', windowSize, threshold, xOverlap, yOverlap, blur);
-matches4 = matchFeaturesOwn(fHM1, fHM2, cornersHM1.coordinates, cornersHM2.coordinates,'MSE', windowSize, threshold, xOverlap, yOverlap, blur);
-matches5 = matchFeaturesOwn(fHM1, fHM2, cornersHM1.coordinates, cornersHM2.coordinates,'NCC', windowSize, thresholdNCC, xOverlap, yOverlap, blur);
+matches1 = matchFeaturesOwn(imgHM1, imgHM2, cornersHM1.coordinates, cornersHM2.coordinates,'SSD', windowSize, threshold*1.2, xOverlap, yOverlap, blur);
+matches2 = matchFeaturesOwn(imgHM1, imgHM2, cornersHM1.coordinates, cornersHM2.coordinates,'SAD', windowSize, threshold, xOverlap, yOverlap, blur);
+matches3 = matchFeaturesOwn(imgHM1, imgHM2, cornersHM1.coordinates, cornersHM2.coordinates,'MAE', windowSize, threshold, xOverlap, yOverlap, blur);
+matches4 = matchFeaturesOwn(imgHM1, imgHM2, cornersHM1.coordinates, cornersHM2.coordinates,'MSE', windowSize, threshold*1.2, xOverlap, yOverlap, blur);
+matches5 = matchFeaturesOwn(imgHM1, imgHM2, cornersHM1.coordinates, cornersHM2.coordinates,'NCC', windowSize, thresholdNCC, xOverlap, yOverlap, blur);
 % Visualize matchet points with interconnections
 if 0 == isempty(matches1)
     figure('NumberTitle', 'off', 'Name', 'SSD');showMatchedFeatures(fHM1,fHM2,[matches1(:,3), matches1(:,2)],[matches1(:,5), matches1(:,4)],'montage','Parent',axes);;

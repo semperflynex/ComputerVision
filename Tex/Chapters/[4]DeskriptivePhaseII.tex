@@ -102,7 +102,7 @@ und
 \\
 $f = [f11,f12,f13,f21,f22,f23,f31,f32,f33]^T$
 \\
-Die Fundamentalmatrix hat trotz ihrer 9 Einträge lediglich 7 Freiheitsgrade, da sie nur bis auf ihren Skalierungsfaktor definiert ist und die Bedingung an sie gestellt wird dass sie den Rang 2 aufweist. Daher kann mit mindestens 8 korrespondierenden Punkte-paaren über die Singulärwertzerlegung eine Lösung für f gefunden werden. Diese ist der Singulärvektor der zum kleinsten Singulärwert von A korrespondiert. Die Singulä-rwerte befinden sich in der Diagonalmatrix D. Zerlegt man A mittels Singulärwertzer-legung in UDV, so ist die Lösung in der letzten Spalte von V zu finden.
+Die Fundamentalmatrix hat trotz ihrer 9 Einträge lediglich 7 Freiheitsgrade, da sie nur bis auf ihren Skalierungsfaktor definiert ist und die Bedingung an sie gestellt wird dass sie den Rang 2 aufweist. Daher kann mit mindestens 8 korrespondierenden Punktepaaren über die Singulärwertzerlegung eine Lösung für f gefunden werden. Diese ist der Singulärvektor der zum kleinsten Singulärwert von A korrespondiert. Die Singulärwerte befinden sich in der Diagonalmatrix D. Zerlegt man A mittels Singulärwertzerlegung in UDV, so ist die Lösung in der letzten Spalte von V zu finden.
 Für eine ideale Fundamentalmatrix müsste nach einer Singulärwertzerlegung gelten:
 \\
 $D_{ideal} = \begin{pmatrix} \sigma_1 & 0 & 0\\0 & \sigma_2 & 0 \\0 & 0 & 0 \end{pmatrix}$
@@ -114,7 +114,7 @@ $D_{real} = \begin{pmatrix} \sigma_1 & 0 & 0\\0 & \sigma_2 & 0 \\0 & 0 & \sigma_
 Daher wird der dritte Diagonaleintrag von D auf 0 gesetzt und die Fundamentalmatrix aus den drei Matrizen aus der Zerlegung erneut berechnet. \cite{Richard2000} \cite{Schreer2005}
 
 \subparagraph{Schätzen der Fundamentalmatrix mittels RANSAC}
-Um eine möglichst gute Fundamentalmatrix zu erhalten, wird der RANSAC Algorithmus verwendet. Er nimmt sich aus der Menge der korrespondierenden Punktepaare 8 zufälllige Punkte heraus. Damit wird über den 8-Punkte Algorithmus eine Fundamentalmatrix berechnet. Um die Güte dieser Fundamentalmatrix zu prüfen wird nun ermit-telt wie viele korrespondierende Punktepaare zu der berechneten Fundamentalmatrix passen. Dazu wird die Sampson Distanz ermittelt, welche sich wie folgt berechnet.
+Um eine möglichst gute Fundamentalmatrix zu erhalten, wird der RANSAC Algorithmus verwendet. Er nimmt sich aus der Menge der korrespondierenden Punktepaare 8 zufälllige Punkte heraus. Damit wird über den 8-Punkte Algorithmus eine Fundamentalmatrix berechnet. Um die Güte dieser Fundamentalmatrix zu prüfen wird nun ermittelt wie viele korrespondierende Punktepaare zu der berechneten Fundamentalmatrix passen. Dazu wird die Sampson Distanz ermittelt, welche sich wie folgt berechnet.
 \\
 \\
 $d =  \dfrac{(x'^TFx)^2}{(Fx)^2_1 + (Fx)^2_2 + (Fx')^2_1) + (Fx')^2_2}$
@@ -122,7 +122,7 @@ $d =  \dfrac{(x'^TFx)^2}{(Fx)^2_1 + (Fx)^2_2 + (Fx')^2_1) + (Fx')^2_2}$
 \\
 $(Fx)^2_j$ beschreibt hier den j-ten Eintrag im Vektor $(Fx)^2$.
 \\
-Liegt ein korrespondierendes Punktepaar unter einem gewissen Schwellwert, zählt er als Inlier und gilt als zum Modell passend. Diese Berechnung wird über viele Iteratio-nen mit immer zufällig ausgewählten Punkten für die Berechnung der Fundamental-matrix wiederholt. Die Fundamentalmatrix die die meisten Inlier hat, deren Modell also am besten zu den Daten passt wird jeweils gespeichert. Wurden alle Iterationen durchlaufen, wird die Fundamentalmatrix erneut über den 8-Punkte Algorithmus mit allen Inliern der besten Fundamentalmatrix berechnet. \cite{Richard2000} \cite{Mathworksb}
+Liegt ein korrespondierendes Punktepaar unter einem gewissen Schwellwert, zählt er als Inlier und gilt als zum Modell passend. Diese Berechnung wird über viele Iterationen mit immer zufällig ausgewählten Punkten für die Berechnung der Fundamentalmatrix wiederholt. Die Fundamentalmatrix die die meisten Inlier hat, deren Modell also am besten zu den Daten passt wird jeweils gespeichert. Wurden alle Iterationen durchlaufen, wird die Fundamentalmatrix erneut über den 8-Punkte Algorithmus mit allen Inliern der besten Fundamentalmatrix berechnet. \cite{Richard2000} \cite{Mathworksb}
 
 \begin{figure}[ht]
     \centering
@@ -151,7 +151,7 @@ Dabei ist W eine Rotationsmatrix und Z schiefsymmetrisch. Hier ergeben sich nun 
 $R_1 = UW'V'$
 \\
 $R_2 = UWV'$
-Beide Lösungen sind gültig und müssen später verifiziert werden. Der Transla-tionsvektor lässt sich einfach aus der dritten Spalte von U ablesen oder durch die Formel:
+Beide Lösungen sind gültig und müssen später verifiziert werden. Der Translationsvektor lässt sich einfach aus der dritten Spalte von U ablesen oder durch die Formel:
 \\
 $t = UZU'$
 ermitteln. Aufgrund des fehlenden Skalierungsfaktors könnte die mögliche Lösung aber auch
@@ -168,7 +168,7 @@ $R_2, t$
 \\
 $R_2, -t$
 \\
-Um zu prüfen welche Kameraposen die richtigen sind wird nun für jede Kombination eine Triangulierung der Inlier aus der Fundamentalmatrix Berechnung durchgeführt. Die erste Kamera befindet sich dabei im Nullpunkt mit der Orientierung eye(3), die zweite hat jeweils eine der vier möglichen Lösungen. Die genaue Vorgehensweise der Triangulation wird im nächsten Kapitel beschrieben. Bei der der Realität entsprechende Lösung, müssten (fast) alle in den 3D Raum triangulierten Punkte vor beiden Kameras liegen, bei den falschen Lösungen müssten sie hinter mindestens einer Kamera liegen. Zum Schluss werden die als richtig ermittelte Lösung noch in das Koordinatensystem der ersten Kamera überführt, indem die Rotationsmatrix transpo-niert wird und diese auf den Translationsvektor multipliziert wird. Dann werden sie als Pose der zweiten Kamera relativ zur ersten zurückgegeben. \cite{Richard2000} \cite{LTH2013}
+Um zu prüfen welche Kameraposen die richtigen sind wird nun für jede Kombination eine Triangulierung der Inlier aus der Fundamentalmatrix Berechnung durchgeführt. Die erste Kamera befindet sich dabei im Nullpunkt mit der Orientierung eye(3), die zweite hat jeweils eine der vier möglichen Lösungen. Die genaue Vorgehensweise der Triangulation wird im nächsten Kapitel beschrieben. Bei der der Realität entsprechende Lösung, müssten (fast) alle in den 3D Raum triangulierten Punkte vor beiden Kameras liegen, bei den falschen Lösungen müssten sie hinter mindestens einer Kamera liegen. Zum Schluss werden die als richtig ermittelte Lösung noch in das Koordinatensystem der ersten Kamera überführt, indem die Rotationsmatrix transponiert wird und diese auf den Translationsvektor multipliziert wird. Dann werden sie als Pose der zweiten Kamera relativ zur ersten zurückgegeben. \cite{Richard2000} \cite{LTH2013}
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.6]{Figures/validierungDerLosungen.PNG}
@@ -179,9 +179,9 @@ Um zu prüfen welche Kameraposen die richtigen sind wird nun für jede Kombinati
 \label{sec:Triangulation}
 Die Triangulation ist eine Technik die aus Bildpunkten auf der Bildebene zweier Kameras Punkte im 3D Raum errechnet. Dafür wird eine Kameramatrix oder Projektionsmatrix benötigt. Sie ist eine 4x3 Matrix und enthält die interenen und externen Kameraparameter einer Kamera.  Sie beschreibt die Projektion eines Punktes in der realen Welt auf die Bildebene der Kamera.
 \\
-$ \begin{pmatrix} x\\y\\w \end{pmatrix} =  \begin{pmatrix} p_11 & p_12 & p_13 & p_14\\  p_21 & p_22 & p_23 & p_24 \\  p_31 & p_32 & p_33 & p_34  \end{pmatrix} \begin{pmatrix} X\\Y\\Z\\W \end{pmatrix}$
+$ \begin{pmatrix} x\\y\\w \end{pmatrix} =  \begin{pmatrix} p_{11} & p_{12} & p_{13} & p_{14}\\  p_{21} & p_{22} & p_{23} & p_{24} \\  p_{31} & p_{32} & p_{33} & p_{34}  \end{pmatrix} \begin{pmatrix} X\\Y\\Z\\W \end{pmatrix}$
 \\
-Hier wird die Datenstruktur CameraMatrix von Matlab verwendet, die aus den Kame-raparametern sowie den zuvor berechneten Kameraposen die Kameramatrix errechnet.
+Hier wird die Datenstruktur CameraMatrix von Matlab verwendet, die aus den Kameraparametern sowie den zuvor berechneten Kameraposen die Kameramatrix errechnet.
 Für die Triangulation wird die Form
 \\
 $x = PX$

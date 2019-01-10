@@ -23,6 +23,7 @@ function [corners, img] = harrisCorners(fRGB, filtSize, sigma, k, T, supFactor, 
 % 'corners'  :  
 %
 % 'img'      :  An image with marked corners
+forig = fRGB;
 
 % Transform image to grayscale if not done yet
 if size(fRGB,3) == 3
@@ -57,7 +58,7 @@ sumfxy = conv2(fxy, weights, "same");
 %% 4. Define at each pixel the Matrix H
 [rows, cols] = size(fx2);
 R = zeros(rows, cols); % Array with image dimensions, containing a value where a corner is detected
-fDetected = f;
+borderLimit = 3; % Reject corners to close to image borders due to their too small neighborhood -> bad comparable
 
 for pixel = 1:numel(fx2)
     H = [sumfx2(pixel) sumfxy(pixel); sumfxy(pixel) sumfy2(pixel)];
@@ -69,6 +70,10 @@ for pixel = 1:numel(fx2)
     if(r > T)
         % Get coordinates of corner
         [row, col]=ind2sub(size(fx2), pixel);
+        % Reject if to close to image borders
+        if row < borderLimit || row > rows - borderLimit || col < borderLimit || col > cols - borderLimit
+            continue;
+        end
         R(pixel) = r;
         %end
     end
@@ -133,13 +138,14 @@ switch visualize
         for pixel = 1:numel(R)
             [row, col] = ind2sub(size(fx2), pixel);
             if R(pixel) > 0
-                f = insertMarker(f, [col row]);
+                forig = insertMarker(forig, [col row]);
             end
         end
-        f = uint8(f);
-        figure, imshow(f);
+        %f = uint8(f);
+        img = forig;
+        figure, imshow(img);
     case 'off'
+        img = forig;
 end
-f = uint8(f);
-img = f;
+
 end
