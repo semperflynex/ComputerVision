@@ -6,8 +6,8 @@ In dieser Aufgabe soll aus einer Reihe von Bildern eines Objekts, welche von ver
 In diesem Kapitel wird der gesamte Algorithmus erklärt, der von der Bildserie zur 3D Punktwolke führt. Er enthält einige komplexe Unteralgorithmen die in den nächsten Kapiteln erläutert werden. Die grobe Vorgehensweise ist an \cite{Mathworks} angelehnt.
 Zunächst müssen die Bilder des Objekts geladen werden. Dabei ist es wichtig dass sie in der richtigen Reihenfolge geladen werden, da aufeinanderfolgende Bilder eine Überlappung von mindestens 50\% haben müssen. Außerdem müssen die Bilder in Grauwertbilder umgewandelt werden, da die darauffolgenden Algorithmen nur mit 1-kanaligen Bildern umgehen können. Zusätzlich müssen die Kameraparameter der Kamera, mit denen die Bilder aufgenommen wurden, geladen werden. Die Ermittlung der Kameraparameter wird in Kapitel \ref{sec:Kamerakalibrierung} beschrieben.
 Nun wird das erste Bild verarbeitet, indem es über die Funktion undistortImage und die Kameraparameter verzeichungsfrei (s. Kapitel \ref{sec:Kamerakalibrierung}) gemacht wird.
-Als nächstes werden auf dem ersten Bild markante Punkte über den Harris Corner Detector (s. Kapitel \ref{sec:Korrespondenzanalyse}) ermittelt. Nun wird der erste Kamerastandpunkt, er ist der Referenzstandpunkt im Nullpunkt mit der Einheitsmatrix als Orientierung, mitsamt der markanten Punkte in eine Datenstruktur mit dem Namen ViewSet gespeichert. Diese speichert alle Parameter eines Kamerastandpunkts und ordnet diesen eine ID zu. Beim ersten Bild ist dies die ID 1.
-Es folgt eine Schleife die über alle Bilder iteriert. Mit dem nächsten Bild wird nun analog zum ersten Verfahren, es wird verzeichnungsfrei gerechnet und seine markanten Punkte werden ermittelt. Nun werden aber Punkte zwischen dem vorigen und dem gerade in der Schleife untersuchten Bild ermittelt die in beiden Bildern vorkommen. Solche Punkte werden als korrespondierende Punkte oder Matches bezeichnet. Die genaue Erläuterung der Berechnung von Matches folgt in Kapitel \ref{sec:Korrespondenzanalyse}.
+Als nächstes werden auf dem ersten Bild markante Punkte über den Harris Corner Detector (s. Kapitel \ref{kap:FeatureErkennungUndKorrespondenzanalyse}) ermittelt. Nun wird der erste Kamerastandpunkt, er ist der Referenzstandpunkt im Nullpunkt mit der Einheitsmatrix als Orientierung, mitsamt der markanten Punkte in eine Datenstruktur mit dem Namen ViewSet gespeichert. Diese speichert alle Parameter eines Kamerastandpunkts und ordnet diesen eine ID zu. Beim ersten Bild ist dies die ID 1.
+Es folgt eine Schleife die über alle Bilder iteriert. Mit dem nächsten Bild wird nun analog zum ersten Verfahren, es wird verzeichnungsfrei gerechnet und seine markanten Punkte werden ermittelt. Nun werden aber Punkte zwischen dem vorigen und dem gerade in der Schleife untersuchten Bild ermittelt die in beiden Bildern vorkommen. Solche Punkte werden als korrespondierende Punkte oder Matches bezeichnet. Die genaue Erläuterung der Berechnung von Matches folgt in Kapitel \ref{kap:FeatureErkennungUndKorrespondenzanalyse}.
 Mit diesen ermittelten Matches kann nun eine sogenannte Fundamentalmatrix berechnet werden. Diese enthält Informationen über die intrinsischen und extrinsischen Kameraparameter. Das genaue Vorgehen zur Berechnug der Fundamentalmatrix sowie deren Eigenschaften werden in Kapitel \ref{sec:Schätzen der Fundamentalmatrix} erläutert. 
 Aus der Fundamentalmatrix kann durch Multiplikation der intrinsischen Kameraparameter beider Kameras (hier identisch da gleiche Kamera) die Essentielle Matrix berechnet werden, die nur noch Informationen über die extrinsischen Kameraparameter enthält. Im nächsten Schritt kann nun aus der Essentiellen Matrix die Lage und Orientierung der Kameras zueinander ermittelt werden. (siehe Kapitel \ref{sec:Schätzen der Kamerapose aus der Fundamentalmatrix}).
 Die berechnete Kamerapose sowie die Matches werden mit der nächsten ID in die ViewSet  Datenstruktur gespeichert. Da zwischen den Bildern jeweils nur relative Posen berechnet werden, müssen diese zuvor noch mit der Position und Orientierung des vorigen Standpunkts verechnet werden. 
@@ -35,28 +35,15 @@ Es gibt zwei Arten von Verzeichnungsfehlern, die tangentiale und die radiale. Di
     }
     \caption{Auswirkung von Verzeichnung (links radial, rechts tangential) \cite{Verlag}}
 \end{figure}
-\\
+
 Matlab bietet eine Applikation die aus Bildern von einem Kalibrierungsboard die Kameraparameter schätzt. Dazu muss das Board aus vielen verschiedenen Positionen (ca. 20) fotographiert werden. 
 \begin{figure}[ht]
-    \subfigure {
-    \includegraphics[scale=0.05]{Figures/Kalib1 (1).jpg}
-    }
-    \subfigure{
-    \includegraphics[scale=0.05]{Figures/Kalib1 (2).jpg}
-    }
-    \subfigure{
-    \includegraphics[scale=0.05]{Figures/Kalib1 (3).jpg}
-    }
-    \subfigure{
-    \includegraphics[scale=0.05]{Figures/Kalib1 (4).jpg}
-    }
+    \centering
+    \includegraphics[scale=0.05]{Figures/Kalib1.jpg}
     \caption{Bilder des Kalibrierungsboards}
 \end{figure}
 
 Aus diesen Bildern und der Information wie groß die Abstände der einzelnen Quadrate sind ermittelt die Applikation extrinsische und intrinsische Kameraparameter. Diese können als CameraParameters Objekt gespeichert und an anderer Stelle wieder geladen werden. Das CameraParamters enthält viele Informationen über die Kamera und die Kalibrierung. Von besonderer Bedeutung für diesen Einsatzweck sind hier die Einträge RadialDistortion und TangentialDistortion, welche für das Entzerren des Bildes wichtig sind. Außerdem wird die IntrinsicMatrix benötigt um aus der Fundamentalmatrix die Essentielle Matrix zu berechnen. \cite{Mathworksa}
-
-\subsection{Korrespondenzanalyse}
-\label{sec:Korrespondenzanalyse}
 
 \subsection{Schätzen der Fundamentalmatrix}
 \label{sec:Schätzen der Fundamentalmatrix}
@@ -175,7 +162,7 @@ Mittels dieser Algorithmen sollte aus folgender Bildfolge eine Punktwolke gerech
 \\
 \\
 \\
-Leider konnte über eine Korrespondenzanalyse über den Harris Corner Detector kein zufriedenstellendes Ergebnis erzielt werden. Entweder die Anzahl gefundener markanter Punkte war zu gering, oder es wurden zu viele markante Punkte als korrespondierend angesehen die es nicht waren. Um die nachfolgenden Algorithmen zu testen wurde die Funktion 'detectSurfFeatures' aus der Matlab Computervision Toolbox verwendet. Hier konnte als Ergebnis die Ecke der Hauswand grob als 3D Punktwolke berechnet werden.
+Leider konnten mit der eigenen Implementierung des Harris Detectors nicht ausreichend korrekte korrespondierende Features in den Bildern gefunden werden, um eine 3D Punktewolke mit erkennbaren Konturen zu bestimmen. Entweder die Anzahl gefundener markanter Punkte war zu gering, oder es wurden zu viele markante Punkte als korrespondierend angesehen die es nicht waren. Um die nachfolgenden Algorithmen zu testen wurde die Funktion 'detectSurfFeatures' aus der Matlab Computervision Toolbox verwendet. Hier konnte als Ergebnis die Ecke der Hauswand grob als 3D Punktwolke berechnet werden.
 
 \begin{figure}[ht]
     \centering
