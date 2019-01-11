@@ -7,7 +7,7 @@ hPoints1 = [matchedPoints1, ones(length(matchedPoints1),1)];
 hPoints2 = [matchedPoints2, ones(length(matchedPoints2),1)];
 
 %Festlegen von Iterationen und Schwellwert für Inlier 
-Iterationen = 30000;
+Iterationen = 10000;
 thresh = 0.1;
 inlierCount = 0;
 bestF = 0;

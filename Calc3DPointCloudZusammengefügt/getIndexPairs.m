@@ -5,7 +5,7 @@ function [ indexPairs] = getIndexPairs(corners, corners2, matchedPoints1, matche
 indexPairs1 = [];
     indexPairs2 = [];
     for j = 1 : length(matchedPoints1)
-        testPoint = [matchedPoints1(j,2), matchedPoints1(j,1)];
+        testPoint = [matchedPoints1(j,1), matchedPoints1(j,2)];
         for k = 1 : length(corners.coordinates)
             if(testPoint == corners.coordinates(k,:))
                 indexPairs1 = [indexPairs1; k];
@@ -13,7 +13,7 @@ indexPairs1 = [];
         end
     end
     for m = 1 : length(matchedPoints2)
-        testPoint = [matchedPoints2(m,2), matchedPoints2(m,1)];
+        testPoint = [matchedPoints2(m,1), matchedPoints2(m,2)];
         for n = 1 : length(corners2.coordinates)
             if(testPoint == corners2.coordinates(n,:))
                 indexPairs2 = [indexPairs2; n];

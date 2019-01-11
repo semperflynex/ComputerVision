@@ -3,19 +3,19 @@
 function calc3DPointCloud
 %Eingabe des Pfades unter dem die Bilddateien liegen (Bildreihenfolge
 %alphabetisch nach Bildname)
-imds = imageDatastore('C:\Users\phili\Desktop\S3 Bilder\Boxen');
+imds = imageDatastore('*.jpg');
 
 %Konvertieren der Bilder in Grauwertbilder
 images = cell(1, numel(imds.Files));
 for i = 1:numel(imds.Files)
     I = readimage(imds, i);
-    %I = imrotate(I, 270);
+    I = imrotate(I, 270);
     images{i} = rgb2gray(I);
     %figure, imshow(I);
 end
 %Laden der Kameraparameter
-load('S3cameraParams.mat');
-I = undistortImage(images{1}, cameraParameters); 
+load('S3cameraParams.mat');%
+I = undistortImage(images{1}, S3cameraParams); 
 
 % Detect features. Increasing 'NumOctaves' helps detect large-scale
 % features in high-resolution images. Use an ROI to eliminate spurious
@@ -24,7 +24,7 @@ I = undistortImage(images{1}, cameraParameters);
 % roi = [border, border, size(I, 2)- 2*border, size(I, 1)- 2*border];
 % prevPoints   = detectSURFFeatures(I, 'NumOctaves', 8, 'ROI', roi);
 % prevFeatures = extractFeatures(I, prevPoints, 'Upright', true);
-[corners, img] = harrisCorners(I, 1, 1, 0.18, 3000000, 1, 'off');
+[corners, img] = harrisCorners(I, 1, 1, 0.05, 1.5e7, 1, 'off');
 
 %Erstellen der ViewSet Datenstruktur zum Speichern aller Kameraposen und
 %zugehörigen Punkte
@@ -32,15 +32,15 @@ vSet = viewSet;
 %Hinzufügen der ersten View die als Referenz im Nullpunkt sowie als
 %Orientierung die Einheitsmatrix besitzt
 viewId = 1;
-vSet = addView(vSet, viewId, 'Points', [corners.coordinates(:,2), corners.coordinates(:,1)], 'Orientation', ...
+vSet = addView(vSet, viewId, 'Points', [corners.coordinates(:,1), corners.coordinates(:,2)], 'Orientation', ...
     eye(3), 'Location', ...
     zeros(1, 3));
 
 %Iterieren über alle Bilder ab dem zweiten
 for i = 2:numel(images)
-    i
-    I2 = undistortImage(images{i}, cameraParameters);
-    
+    imds.Files(i)
+    I2 = undistortImage(images{i}, S3cameraParams);
+
 %     % Detect, extract and match features.
 %     currPoints   = detectSURFFeatures(I, 'NumOctaves', 8, 'ROI', roi);
 %     currFeatures = extractFeatures(I, currPoints, 'Upright', true);    
@@ -51,16 +51,17 @@ for i = 2:numel(images)
 %     % Select matched points.
 %     matchedPoints1 = prevPoints(indexPairs(:, 1));
 %     matchedPoints2 = currPoints(indexPairs(:, 2));
-    [corners2, img2] = harrisCorners(I2, 1, 1, 0.18, 3000000, 1, 'off');
+    [corners2, img2] = harrisCorners(I2, 1, 1, 0.05, 1.5e7, 1, 'off');
     % Parameters for matching
-    windowSize = 7;
-    threshold = 3000000;
+    windowSize = 20;
+    threshold = 40000;
+    thresholdNCC = 1;
     xOverlap = 0.6;
     yOverlap = 0.9;
     blur = 'off';
-    matches = matchFeaturesOwn(I2, I, corners2.coordinates, corners.coordinates,'SSD', windowSize, threshold, xOverlap, yOverlap, blur);
-    matchedPoints2 = [matches(:,3),matches(:,2)];
-    matchedPoints1 = [matches(:,5),matches(:,4)];
+    matches = matchFeaturesOwn(I,I2, corners.coordinates,corners2.coordinates, 'NCC', windowSize, 1, xOverlap, yOverlap, blur);
+    matchedPoints1 = [matches(:,2),matches(:,3)];
+    matchedPoints2 = [matches(:,4),matches(:,5)];
     %Schätzen der Fundamentalmatrix
     [F, inlierIdx] = RANSAC_F_MATRIX( matchedPoints1,matchedPoints2);
     %Extrahieren der Essenziellen Matrix aus der geschätzten
@@ -68,9 +69,9 @@ for i = 2:numel(images)
     E = S3cameraParams.IntrinsicMatrix * F * S3cameraParams.IntrinsicMatrix';
     %Extrahieren der Kamerapose aus der Essenziellen Matrix
     [relativeOrient, relativeLoc] = getCameraPose(E,S3cameraParams,matchedPoints1(inlierIdx,:), matchedPoints2(inlierIdx,:));
-
+    saveRelLoc(i,:) = relativeLoc;
     %Hinzufügen der neuen Pose und deren Punkte in ViewSet
-    vSet = addView(vSet, i, 'Points',  [corners2.coordinates(:,2), corners2.coordinates(:,1)]);
+    vSet = addView(vSet, i, 'Points',  [corners2.coordinates(:,1), corners2.coordinates(:,2)]);
     indexPairs = getIndexPairs(corners,corners2, matchedPoints1, matchedPoints2);   
     vSet = addConnection(vSet, i-1, i, 'Matches', indexPairs(inlierIdx,:));
     prevPose = poses(vSet, i-1);
