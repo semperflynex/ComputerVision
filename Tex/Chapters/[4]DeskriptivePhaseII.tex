@@ -162,7 +162,14 @@ Mittels dieser Algorithmen sollte aus folgender Bildfolge eine Punktwolke gerech
 \\
 \\
 \\
-Leider konnten mit der eigenen Implementierung des Harris Detectors nicht ausreichend korrekte korrespondierende Features in den Bildern gefunden werden, um eine 3D Punktewolke mit erkennbaren Konturen zu bestimmen. Entweder die Anzahl gefundener markanter Punkte war zu gering, oder es wurden zu viele markante Punkte als korrespondierend angesehen die es nicht waren. Um die nachfolgenden Algorithmen zu testen wurde die Funktion 'detectSurfFeatures' aus der Matlab Computervision Toolbox verwendet. Hier konnte als Ergebnis die Ecke der Hauswand grob als 3D Punktwolke berechnet werden.
+Die Implementierung mit einer Korrespondenzanalyse mittels Harris Corner Detector und den Ähnlichkeitsmetriken NCC und MAE liefert folgendes Ergebnis.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.4]{Figures/ErgebnisZusammen2.png}
+    \caption{Ergebnis Punktwolke}
+\end{figure}
+Man kann erkennen dass die Posen dem Verlauf der Kamerastandpunkte der Realität grob folgen. Allerdings sind diese mit Fehlern behaftet, sodass Sprünge zwischen den Posen auftreten die in Wirklichkeit nicht gemacht wurden. Dies wirkt sich auch auf die Qualität der Punktwolke aus. So ist die Kontur der Mauer erkennbar, doch die Punkte sind von vielen fehlerhaft rekonstruierten Punkten umgeben, welche sich aus den Fehlern der Kameraposen ergeben. Der Grund für diese Fehler liegt an der Verarbeitung zwischen Punktkorrespondenzen und der Berechnung der Fundamentalmatrix. Meist konnten hier nur wenige(10-30 von insgesamt ca. 200) Punktkorrespondenzen verwendet werden, die das Modell der Fundamentalmatrix stützen. Um dies zu testen 
+wurde die Funktion 'detectSurfFeatures' aus der Matlab Computervision Toolbox zur Ermittlung der Punktkorrespondenzen verwendet. Hier war zunächst die Anzahl der gefundenen Punktkorrespondenzen höher (zw. 500 und 3000) und somit konnten auch mehr Matches verwendet werden die eine errechnete Fundamentalmatrix stützen. Je mehr Punkte (zw. 100 und 1000) für die Berechnung der Fundamentalmatrix verwendet werden, desto höher ist ihre Genauigkeit. Im Ergebnis kann man sehen dass eine weitaus dichtere Punktwolke entsteht die die Kontur der Hauswand sehr genau wiedergibt.
 
 \begin{figure}[ht]
     \centering
